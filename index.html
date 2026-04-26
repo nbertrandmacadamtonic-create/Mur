@@ -167,20 +167,20 @@ function svgFigDebord(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 
 
 // ─── ORIGAMI ICONS ───
 function svgIcoActiver(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
-<polygon points="22,2 40,38 4,38" fill="#1a4898" opacity="0.95"/>
-<polygon points="22,2 40,38 22,26" fill="#2a6acc" opacity="0.9"/>
-<polygon points="22,2 4,38 22,26" fill="#3a8ae8" opacity="0.75"/>
-<polygon points="22,26 40,38 4,38" fill="#4a9af8" opacity="0.3"/></svg>`}
+<polygon points="22,2 40,38 4,38" fill="#1a6020" opacity="0.95"/>
+<polygon points="22,2 40,38 22,26" fill="#2a8830" opacity="0.9"/>
+<polygon points="22,2 4,38 22,26" fill="#3aaa40" opacity="0.8"/>
+<polygon points="22,26 40,38 4,38" fill="#50c055" opacity="0.35"/></svg>`}
 
 function svgIcoEntretenir(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
-<polygon points="22,3 34,13 30,27 22,31 14,27 10,13" fill="#286820" opacity="0.95"/>
-<polygon points="22,3 10,13 22,18" fill="#4aaa30" opacity="0.8"/>
-<polygon points="22,3 34,13 22,18" fill="#388828" opacity="0.9"/>
-<polygon points="10,13 14,27 22,18" fill="#3a9828" opacity="0.75"/>
-<polygon points="34,13 30,27 22,18" fill="#1a5810" opacity="0.9"/>
-<polygon points="22,31 26,37 22,42 18,37" fill="#3a9828" opacity="0.9"/>
-<polygon points="22,31 26,37 22,38" fill="#50b840" opacity="0.65"/>
-<polygon points="22,31 18,37 22,38" fill="#286820" opacity="0.85"/></svg>`}
+<polygon points="22,3 34,13 30,27 22,31 14,27 10,13" fill="#a08800" opacity="0.95"/>
+<polygon points="22,3 10,13 22,18" fill="#e0c030" opacity="0.85"/>
+<polygon points="22,3 34,13 22,18" fill="#c8a820" opacity="0.9"/>
+<polygon points="10,13 14,27 22,18" fill="#b09010" opacity="0.8"/>
+<polygon points="34,13 30,27 22,18" fill="#806800" opacity="0.9"/>
+<polygon points="22,31 26,37 22,42 18,37" fill="#c8b020" opacity="0.9"/>
+<polygon points="22,31 26,37 22,38" fill="#f0d840" opacity="0.65"/>
+<polygon points="22,31 18,37 22,38" fill="#a08800" opacity="0.85"/></svg>`}
 
 function svgIcoRéguler(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
 <polygon points="22,2 40,15 34,36 10,36 4,15" fill="#904808" opacity="0.95"/>
@@ -411,16 +411,17 @@ function renderHome(){
       <div style="font-size:12px;color:${C.ts};margin-top:9px;text-align:center;line-height:1.7">Prenez quelques minutes<br/>pour mieux vous connaître<br/>et choisir juste.</div>
     </div>
     <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
-      <button class="card-btn blue" onclick="go('kis-quiz')">
+      <div class="card-btn blue" style="cursor:${kis?'default':'pointer'};opacity:${kis?0.85:1}" onclick="if(!getKis())go('kis-quiz')">
         <div style="display:flex;align-items:center;gap:14px">
           ${svgFigPosé(66)}
           <div>
             <div style="font-size:17px;font-weight:700;color:${C.tx}">ki.S</div>
             <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${kis?kis.pr+(kis.dom?" — "+kis.dom:""):"Votre tendance de fond"}</div>
+            ${kis?'<div style="font-size:10px;color:#848678;margin-top:4px">🔒 Verrouillé — appuyez sur Reset pour refaire</div>':""}
           </div>
         </div>
-        <span style="color:${C.ts};font-size:22px">›</span>
-      </button>
+        <span style="color:${C.ts};font-size:${kis?16:22}px">${kis?"🔒":"›"}</span>
+      </div>
       <button class="card-btn" onclick="go('now-quiz')">
         <div style="display:flex;align-items:center;gap:14px">
           ${now?svgFamilyIcon(now.fa,52):svgFigFunam(66)}
@@ -431,7 +432,7 @@ function renderHome(){
         </div>
         <span style="color:${C.ts};font-size:22px">›</span>
       </button>
-      <div class="card" style="display:flex;align-items:center;gap:16px">
+      <div class="card" style="display:flex;align-items:center;gap:16px;cursor:pointer" onclick="go('neuroflex')">
         <div style="position:relative;width:66px;height:66px;flex-shrink:0">
           ${svgRing(nf?nf/100:0,nf?C.fL:C.td,66,7)}
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
@@ -439,10 +440,11 @@ function renderHome(){
             ${nf?`<div style="font-size:8px;color:${C.ts}">/100</div>`:""}
           </div>
         </div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div style="font-size:16px;font-weight:700;color:${C.tx}">NeuroFlex</div>
-          <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${nf?(nf>=75?"Excellente":nf>=55?"Bonne":nf>=35?"Moyenne":"Faible")+" capacité d'adaptation":"Votre niveau d'adaptation"}</div>
+          <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${nf?(nf>=75?"Excellente":nf>=55?"Bonne":nf>=35?"Moyenne":"Faible")+" capacité<br/>d'adaptation":"Votre niveau<br/>d'adaptation"}</div>
         </div>
+        <span style="color:${C.ts};font-size:20px;flex-shrink:0">›</span>
       </div>
     </div>
   </div>`;
@@ -559,6 +561,7 @@ function pickNow(v){
     } else {
       state.nowAns=na;state.nowAnswers=[];state.nowStep=0;state.nowSel=null;
       const k=getKis(),n=calcNow(na),nfv=(k&&n)?calcNF(k.sc,n.snv):null;
+      // Toujours ajouter une nouvelle entrée pour chaque test Ici & Maintenant
       state.history.push({date:Date.now(),kis:k,now:n,nf:nfv});
       persist();go('now-result');
     }
@@ -570,10 +573,10 @@ function renderNowResult(){
   const r=getNow();if(!r)return"";
   const snvD=(r.snv>0?"+":"")+r.snv;
   const pct=(r.snv+50)/100;
-  const fams=[{id:"ACTIVER",c:C.pB,d:"Manque d'énergie",d2:"Système trop bas"},
-    {id:"ENTRETENIR",c:C.fB,d:"Équilibre",d2:"Temps disponible"},
-    {id:"RÉGULER",c:C.oB,d:"Tension modérée",d2:"Système qui monte"},
-    {id:"FREINER",c:C.rB,d:"Surcharge",d2:"Système trop haut"}];
+  const fams=[{id:"ACTIVER",c:"#4a8830",d:"Manque d'énergie",d2:"Système trop bas"},
+    {id:"ENTRETENIR",c:"#c8b020",d:"Équilibre",d2:"Temps disponible"},
+    {id:"RÉGULER",c:"#e08828",d:"Tension modérée",d2:"Système qui monte"},
+    {id:"FREINER",c:"#a82010",d:"Surcharge",d2:"Système trop haut"}];
   const famsHtml=fams.map(f=>{
     const ac=f.id===r.fa;
     return`<div style="flex:1;text-align:center;background:${ac?f.c+'20':'transparent'};border:1px solid ${ac?f.c+'88':C.border};border-radius:11px;padding:9px 3px">
@@ -584,7 +587,17 @@ function renderNowResult(){
     </div>`;
   }).join('');
   return`
-    ${topBar("RÉSULTAT",r.cl,"go('home')")}
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
+      <span style="font-size:11px;letter-spacing:2.5px;color:${r.cl};font-weight:700">RÉSULTAT</span>
+      <button onclick="shareNow()" style="background:none;border:none;cursor:pointer;padding:4px" title="Partager">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${r.cl}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+      </button>
+    </div>
     <div class="scroll" style="padding:18px 16px">
       <div style="display:flex;justify-content:center;margin-bottom:16px">
         <div style="position:relative;width:170px;height:170px">
@@ -609,16 +622,56 @@ function renderNowResult(){
       <div class="card" style="margin-bottom:16px">
         <div style="display:flex;gap:8px">${famsHtml}</div>
       </div>
-      <button class="btn-primary" style="background:${r.co}" onclick="go('home')"><span>Retour à l'accueil</span><span>→</span></button>
+      <button class="btn-primary" style="background:${r.co};margin-bottom:10px" onclick="go('home')"><span>Retour à l'accueil</span><span>→</span></button>
+      <button onclick="shareNow()" style="width:100%;padding:15px;background:${C.cardAlt};border:1px solid ${C.border};border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e2e0d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        <span style="color:${C.tx};font-size:15px;font-weight:700;font-family:Georgia,serif">Partager mes résultats</span>
+      </button>
     </div>`;
+}
+
+
+// ─── GRAPHIQUE NEUROFLEX ───
+function renderGraph_NF(){
+  const nfEntries=state.history.filter(s=>s.nf!==null&&s.nf!==undefined).slice(-20);
+  if(nfEntries.length<2)return`<div style="text-align:center;padding:14px;color:${C.ts};font-size:12px">Complétez ki.S + Ici &amp; Maintenant<br/>plusieurs fois pour voir l'évolution.</div>`;
+  const W=320,H=110,PAD=22;
+  const toY=v=>PAD+(H-2*PAD)*(1-v/100);
+  const toX=(i,n)=>PAD+(W-2*PAD)*(i/(n-1));
+  const pts=nfEntries.map((s,i)=>({x:toX(i,nfEntries.length),y:toY(s.nf),nf:s.nf,date:s.date}));
+  const zones=[{min:0,max:30,c:"#a8201020"},{min:30,max:60,c:"#b86a0820"},{min:60,max:80,c:"#c8b02018"},{min:80,max:100,c:"#4a883020"}];
+  const zoneRects=zones.map(z=>`<rect x="${PAD}" y="${toY(z.max).toFixed(1)}" width="${W-2*PAD}" height="${(toY(z.min)-toY(z.max)).toFixed(1)}" fill="${z.c}"/>`).join('');
+  const polyline=`<polyline points="${pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')}" fill="none" stroke="#72c44a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const nfColor=nf=>(nf>=81?"#4a8830":nf>=61?"#c8b020":nf>=31?"#e08828":"#a82010");
+  const circles=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="${nfColor(p.nf)}" stroke="#0d0f0b" stroke-width="2"/>`).join('');
+  const labels=pts.map((p,i)=>{
+    const anchor=i===0?"start":i===pts.length-1?"end":"middle";
+    return`<text x="${p.x.toFixed(1)}" y="${(p.y-9).toFixed(1)}" text-anchor="${anchor}" fill="#e2e0d4" font-size="10" font-weight="bold" font-family="Georgia,serif">${p.nf}</text>`;
+  }).join('');
+  const yLabels=[100,60,30,0].map(v=>`<text x="${PAD-3}" y="${(toY(v)+4).toFixed(1)}" text-anchor="end" fill="#848678" font-size="7" font-family="Georgia,serif">${v}</text>`).join('');
+  const d1=new Date(pts[0].date),dN=new Date(pts[pts.length-1].date);
+  const fD=d=>d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"});
+  const dateL=`<text x="${PAD}" y="${H-2}" text-anchor="start" fill="#848678" font-size="7">${fD(d1)}</text><text x="${W-PAD}" y="${H-2}" text-anchor="end" fill="#848678" font-size="7">${fD(dN)}</text>`;
+  return`<div style="background:${C.cardAlt};border-radius:14px;padding:14px;margin-bottom:14px">
+    <div style="font-size:9px;letter-spacing:2px;color:${C.ts};margin-bottom:10px;font-weight:700">ÉVOLUTION NEUROFLEX</div>
+    <svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">${zoneRects}${polyline}${circles}${labels}${yLabels}${dateL}</svg>
+    <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap">
+      ${[{c:"#a82010",l:"Faible 0–30"},{c:"#e08828",l:"Moyen 31–60"},{c:"#c8b020",l:"Bon 61–80"},{c:"#4a8830",l:"Excellent 81–100"}].map(z=>`<div style="display:flex;align-items:center;gap:3px"><div style="width:7px;height:7px;border-radius:50%;background:${z.c}"></div><span style="font-size:7px;color:${C.ts}">${z.l}</span></div>`).join('')}
+    </div>
+  </div>`;
 }
 
 // ─── NEUROFLEX ───
 function renderNF(){
   const nf=getNF()||72;
-  const segs=[{r:"0–30",lb:"Faible",c:C.rB,ic:"FREINER"},{r:"31–60",lb:"Moyenne",c:C.oB,ic:"RÉGULER"},
-    {r:"61–80",lb:"Bonne",c:C.fB,ic:"ENTRETENIR"},{r:"81–100",lb:"Excellente",c:C.pB,ic:"ACTIVER"}];
+  const segs=[{r:"0–30",lb:"Faible",c:"#a82010",ic:"FREINER"},{r:"31–60",lb:"Modérée",c:"#e08828",ic:"RÉGULER"},
+    {r:"61–80",lb:"Bonne",c:"#c8b020",ic:"ENTRETENIR"},{r:"81–100",lb:"Excellente",c:"#4a8830",ic:"ACTIVER"}];
   const ai=nf<=30?0:nf<=60?1:nf<=80?2:3;
+  const nfCols=["#a82010","#e08828","#c8b020","#4a8830"];
   const segsHtml=segs.map((s,i)=>`
     <div style="flex:1;text-align:center;background:${i===ai?s.c+'22':'transparent'};border:1px solid ${i===ai?s.c+'88':C.border};border-radius:11px;padding:10px 3px">
       <div style="display:flex;justify-content:center;margin-bottom:6px">${svgFamilyIcon(s.ic,28)}</div>
@@ -627,14 +680,20 @@ function renderNF(){
     </div>`).join('');
   return`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
-      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('history')">←</button>
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
       <div style="text-align:center">${svgMurLogo(20,C.fL)}<div style="font-size:10px;letter-spacing:2px;color:${C.fL};font-weight:700;margin-top:2px">NEUROFLEX</div></div>
-      <div style="width:28px"></div>
+      <button onclick="shareNF()" style="background:none;border:none;cursor:pointer;padding:4px" title="Partager">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${C.fL}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+      </button>
     </div>
     <div class="scroll" style="padding:22px 16px">
       <div style="display:flex;justify-content:center;margin-bottom:16px">
         <div style="position:relative;width:200px;height:200px">
-          ${svgRing(nf/100,segs[ai].c,200,16)}
+          ${svgRing(nf/100,nfCols[ai],200,16)}
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:70px;font-weight:900;color:${C.tx};line-height:1">${nf}</div>
             <div style="font-size:14px;color:${C.ts};margin-top:3px">/100</div>
@@ -644,13 +703,55 @@ function renderNF(){
       <div style="text-align:center;margin-bottom:20px">
         <div style="font-size:16px;color:${C.tx};line-height:1.6">${segs[ai].lb} capacité<br/>d'adaptation</div>
       </div>
-      <div class="card">
+      <div class="card" style="margin-bottom:14px">
         <div style="display:flex;gap:8px;margin-bottom:14px">${segsHtml}</div>
         <div style="font-size:13px;color:${C.ts};text-align:center;line-height:1.7;padding:12px 0 0;border-top:1px solid ${C.border}">
           Plus votre score est élevé,<br/>plus votre système est souple<br/>et résilient face aux défis.
         </div>
       </div>
+      ${renderSessionsInNF()}
     </div>`;
+}
+
+// ─── SESSIONS DANS NEUROFLEX ───
+function renderSessionsInNF(){
+  const sessions=[...state.history].reverse();
+  if(sessions.length===0)return`<div style="text-align:center;padding:20px;color:${C.ts};font-size:12px">Aucune session enregistrée.</div>`;
+  const fmt=ts=>{
+    const d=new Date(ts);
+    return d.toLocaleDateString("fr-FR",{weekday:"short",day:"2-digit",month:"short"})+" · "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  };
+  const entries=sessions.map(s=>{
+    const snvD=s.now?(s.now.snv>0?"+":"")+s.now.snv:null;
+    return`<div style="background:${C.cardAlt};border:1px solid ${C.border};border-radius:14px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:10px;color:${C.ts}">${fmt(s.date)}</div>
+        ${s.nf!==null&&s.nf!==undefined?`<div style="background:${C.fB}22;border:1px solid ${C.fB}44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:${C.fL}">NF ${s.nf}</div>`:""}
+      </div>
+      ${s.kis?`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${C.pBg};border:1px solid ${C.pB}33;border-radius:10px;margin-bottom:8px">
+        <div style="font-size:9px;letter-spacing:1px;color:${C.pL};font-weight:700;min-width:28px">KI.S</div>
+        <div><div style="font-size:13px;font-weight:700;color:${C.tx}">${s.kis.pr}</div>${s.kis.dom?`<div style="font-size:10px;color:${C.ts}">${s.kis.dom}</div>`:""}</div>
+      </div>`:""}
+      ${s.now?`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${s.now.bg};border:1px solid ${s.now.co}33;border-radius:10px">
+        <div style="font-size:9px;letter-spacing:1px;color:${s.now.cl};font-weight:700;min-width:28px">SNV</div>
+        <div style="flex:1">
+          <div style="font-size:18px;font-weight:900;color:${C.tx};line-height:1">${snvD}</div>
+          <div style="font-size:11px;color:${s.now.cl};margin-top:2px">${s.now.fa} · ${s.now.zo.replace("ZONE ","Zone ")}</div>
+        </div>
+        <div style="position:relative;width:42px;height:42px;flex-shrink:0">
+          ${svgRing((s.now.snv+50)/100,s.now.co,42,5)}
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:${C.tx}">${snvD}</div>
+        </div>
+      </div>`:""}
+    </div>`;
+  }).join('');
+  return`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:9px;letter-spacing:2px;color:${C.ts};font-weight:700">SESSIONS</div>
+      <button onclick="clearHistory();render();" style="background:none;border:1px solid ${C.border};border-radius:8px;padding:3px 10px;color:${C.ts};font-size:11px;cursor:pointer">Effacer</button>
+    </div>
+    ${entries}
+  </div>`;
 }
 
 // ─── SYNTHÈSE ───
@@ -722,6 +823,83 @@ function renderHistory(){
     </div>`;
 }
 
+// ─── GRAPHIQUE SNV ───
+function renderGraph(){
+  const nowEntries=state.history.filter(s=>s.now).slice(-20);
+  if(nowEntries.length<2)return`<div style="text-align:center;padding:20px;color:${C.ts};font-size:13px">Faites au moins 2 tests<br/>Ici & Maintenant pour voir le graphique.</div>`;
+  const W=340,H=120,PAD=20;
+  const vals=nowEntries.map(s=>s.now.snv);
+  const MIN=-50,MAX=50,RANGE=100;
+  // Zones colorées
+  const zones=[
+    {min:15,max:50,c:"#a8201022"},
+    {min:5,max:15,c:"#b86a0822"},
+    {min:-4,max:5,c:"#4a883022"},
+    {min:-50,max:-4,c:"#2a5faa22"},
+  ];
+  const toY=v=>PAD+(H-2*PAD)*(1-(v-MIN)/RANGE);
+  const toX=(i,n)=>PAD+(W-2*PAD)*(i/(n-1));
+  const zoneRects=zones.map(z=>{
+    const y1=toY(z.max),y2=toY(z.min);
+    return`<rect x="${PAD}" y="${y1}" width="${W-2*PAD}" height="${y2-y1}" fill="${z.c}"/>`;
+  }).join('');
+  // Ligne zéro
+  const y0=toY(0);
+  const zeroline=`<line x1="${PAD}" y1="${y0}" x2="${W-PAD}" y2="${y0}" stroke="#ffffff22" stroke-width="1" stroke-dasharray="4,3"/>`;
+  // Points et ligne
+  const pts=nowEntries.map((s,i)=>({x:toX(i,nowEntries.length),y:toY(s.now.snv),snv:s.now.snv,co:s.now.co,fa:s.now.fa,date:s.date}));
+  const polyline=`<polyline points="${pts.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="${C.fL}" stroke-width="2" stroke-linejoin="round"/>`;
+  const circles=pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.co}" stroke="${C.bg}" stroke-width="2"/>`).join('');
+  // Labels dates
+  const dateLabels=pts.filter((_,i)=>i===0||i===pts.length-1).map(p=>{
+    const d=new Date(p.date);
+    const lbl=d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+    return`<text x="${p.x}" y="${H-4}" text-anchor="middle" fill="${C.ts}" font-size="8" font-family="Georgia,serif">${lbl}</text>`;
+  }).join('');
+  // Labels valeurs axe Y
+  const yLabels=[50,0,-50].map(v=>{
+    const y=toY(v);
+    return`<text x="${PAD-3}" y="${y+4}" text-anchor="end" fill="${C.ts}" font-size="8" font-family="Georgia,serif">${v>0?"+":""}${v}</text>`;
+  }).join('');
+  const svg=`<svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">
+    ${zoneRects}${zeroline}${polyline}${circles}${dateLabels}${yLabels}
+  </svg>`;
+  return`<div style="background:${C.cardAlt};border-radius:14px;padding:14px;margin-bottom:14px">
+    <div style="font-size:9px;letter-spacing:2px;color:${C.ts};margin-bottom:10px;font-weight:700">ÉVOLUTION SNV</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      ${[{c:C.rB,l:"Freiner"},{c:C.oB,l:"Réguler"},{c:C.fB,l:"Entretenir"},{c:C.pB,l:"Activer"}].map(z=>`<div style="display:flex;align-items:center;gap:3px"><div style="width:8px;height:8px;border-radius:50%;background:${z.c}"></div><span style="font-size:8px;color:${C.ts}">${z.l}</span></div>`).join('')}
+    </div>
+    ${svg}
+  </div>`;
+}
+
+
+// ─── GRAPHIQUE SNV ───
+function renderGraph(){
+  const nowEntries=state.history.filter(s=>s.now).slice(-20);
+  if(nowEntries.length<2)return`<div style="text-align:center;padding:20px;color:${C.ts};font-size:13px">Faites au moins 2 tests Ici &amp; Maintenant pour voir le graphique.</div>`;
+  const W=320,H=120,PAD=22;
+  const MIN=-50,MAX=50,RANGE=100;
+  const zones=[{min:15,max:50,c:"#a8201022"},{min:5,max:15,c:"#b86a0822"},{min:-4,max:5,c:"#4a883022"},{min:-50,max:-4,c:"#2a5faa22"}];
+  const toY=v=>PAD+(H-2*PAD)*(1-(v-MIN)/RANGE);
+  const toX=(i,n)=>PAD+(W-2*PAD)*(i/(n-1));
+  const zoneRects=zones.map(z=>`<rect x="${PAD}" y="${toY(z.max).toFixed(1)}" width="${W-2*PAD}" height="${(toY(z.min)-toY(z.max)).toFixed(1)}" fill="${z.c}"/>`).join('');
+  const y0=toY(0);
+  const zeroline=`<line x1="${PAD}" y1="${y0.toFixed(1)}" x2="${W-PAD}" y2="${y0.toFixed(1)}" stroke="#ffffff22" stroke-width="1" stroke-dasharray="4,3"/>`;
+  const pts=nowEntries.map((s,i)=>({x:toX(i,nowEntries.length),y:toY(s.now.snv),snv:s.now.snv,co:s.now.co,fa:s.now.fa,date:s.date}));
+  const polyline=`<polyline points="${pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')}" fill="none" stroke="#72c44a" stroke-width="2" stroke-linejoin="round"/>`;
+  const circles=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="${p.co}" stroke="#0d0f0b" stroke-width="2"/>`).join('');
+  const yLabels=[50,0,-50].map(v=>`<text x="${PAD-3}" y="${(toY(v)+4).toFixed(1)}" text-anchor="end" fill="#848678" font-size="8" font-family="Georgia,serif">${v>0?"+":""}${v}</text>`).join('');
+  const svg=`<svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">${zoneRects}${zeroline}${polyline}${circles}${yLabels}</svg>`;
+  return`<div style="background:#181b14;border-radius:14px;padding:14px;margin-bottom:14px">
+    <div style="font-size:9px;letter-spacing:2px;color:#848678;margin-bottom:8px;font-weight:700">ÉVOLUTION SNV</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      ${[{c:"#a82010",l:"Freiner"},{c:"#e08828",l:"Réguler"},{c:"#4a8830",l:"Entretenir"},{c:"#4a8830",l:"Activer"}].map(z=>`<div style="display:flex;align-items:center;gap:3px"><div style="width:7px;height:7px;border-radius:50%;background:${z.c}"></div><span style="font-size:8px;color:#848678">${z.l}</span></div>`).join('')}
+    </div>
+    ${svg}
+  </div>`;
+}
+
 // ─── HISTORIQUE ───
 function renderHistList(){
   const fmt=ts=>{const d=new Date(ts);return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"})+" · "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});};
@@ -752,11 +930,14 @@ function renderHistList(){
       </div>`).join('');
   return`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
-      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('history')">←</button>
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
       <span style="font-size:11px;letter-spacing:2.5px;color:${C.fL};font-weight:700">HISTORIQUE</span>
       <button onclick="clearHistory()" style="background:none;border:1px solid ${C.border};border-radius:8px;padding:4px 10px;color:${C.ts};font-size:11px;cursor:pointer">Effacer</button>
     </div>
-    <div class="scroll" style="padding:14px">${entries}</div>`;
+    <div class="scroll" style="padding:14px">
+      ${renderGraph()}
+      ${entries}
+    </div>`;
 }
 
 // ─── CONSEILS ───
@@ -847,8 +1028,7 @@ function render(){
   else if(s==="now-quiz")html=renderNowQuiz();
   else if(s==="now-result")html=renderNowResult();
   else if(s==="neuroflex")html=renderNF();
-  else if(s==="history") html=renderHistory();
-  else if(s==="hist-list")html=renderHistList();
+  else if(s==="history") html=renderHistList();
   else if(s==="conseils")html=renderConseils();
   else if(s==="about")   html=renderAbout();
   el.innerHTML=`<div class="screen" style="display:flex;flex-direction:column;height:100%">${html}</div>`;
@@ -862,6 +1042,345 @@ function resetAll(){
   persist();go('home');
 }
 function clearHistory(){state.history=[];persist();render();}
+
+// ─── PARTAGE — CARTE IMAGE ───
+function buildShareText(){
+  const n=getNow(),k=getKis(),nf=getNF();
+  if(!n)return null;
+  const snvD=(n.snv>0?"+":"")+n.snv;
+  const d=new Date();
+  const dateStr=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})+" à "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  return "🧠 MUR — Flexibilité Neuronale\n📅 "+dateStr+"\n\n"
+    +"⚡ ICI & MAINTENANT\nScore SNV : "+snvD+"\nZone : "+n.zo.replace("ZONE ","")+"\nOrientation : "+n.fa
+    +(k?"\n\n🎯 PROFIL ki.S\n"+k.pr+(k.dom?" — "+k.dom:""):"")
+    +(nf!==null?"\n\n💚 NEUROFLEX : "+nf+"/100":"")
+    +"\n\nTesté avec l'app MUR — Flexibilité Neuronale";
+}
+
+function shareViaMail(text){
+  window.location.href="mailto:?subject="+encodeURIComponent("MUR — Mes résultats")+"&body="+encodeURIComponent(text||buildShareText()||"");
+}
+
+function showToast(msg){
+  const t=document.createElement("div");
+  t.textContent=msg;
+  t.style.cssText="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#72c44a;color:#0d0f0b;padding:10px 20px;border-radius:20px;font-size:14px;font-family:Georgia,serif;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px #00000066";
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+function shareNow(){
+  const n=getNow(),k=getKis(),nf=getNF();
+  if(!n){showToast("Complétez d'abord un test !");return;}
+
+  // Générer la carte sur canvas
+  const canvas=document.createElement("canvas");
+  const W=800,H=500;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext("2d");
+
+  // Fond dégradé sombre
+  const grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,"#0d0f0b");
+  grad.addColorStop(1,"#181b14");
+  ctx.fillStyle=grad;
+  ctx.roundRect(0,0,W,H,24);
+  ctx.fill();
+
+  // Bordure colorée
+  ctx.strokeStyle=n.co+"99";
+  ctx.lineWidth=2;
+  ctx.roundRect(1,1,W-2,H-2,24);
+  ctx.stroke();
+
+  // Logo MUR (texte)
+  ctx.fillStyle="#72c44a";
+  ctx.font="bold 13px Georgia,serif";
+  ctx.letterSpacing="6px";
+  ctx.fillText("M U R",34,44);
+  ctx.letterSpacing="0px";
+
+  // Trait séparateur haut
+  ctx.strokeStyle="#21241b";
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,54);ctx.lineTo(W-34,54);ctx.stroke();
+
+  // Date
+  const d=new Date();
+  const dateStr=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})
+    +" · "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  ctx.fillStyle="#848678";
+  ctx.font="13px Georgia,serif";
+  ctx.fillText(dateStr,34,78);
+
+  // Titre
+  ctx.fillStyle="#e2e0d4";
+  ctx.font="bold 28px Georgia,serif";
+  ctx.fillText("Flexibilité Neuronale",34,120);
+
+  // ── BLOC ICI & MAINTENANT ──
+  const snvD=(n.snv>0?"+":"")+n.snv;
+  // Fond bloc
+  ctx.fillStyle=n.bg||"#180e00";
+  ctx.strokeStyle=n.co+"55";
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(34,140,340,210,14);ctx.fill();ctx.stroke();
+
+  ctx.fillStyle=n.cl;
+  ctx.font="bold 10px Georgia,serif";
+  ctx.letterSpacing="2px";
+  ctx.fillText("ICI & MAINTENANT",54,172);
+  ctx.letterSpacing="0px";
+
+  // Score SNV grand
+  ctx.fillStyle="#e2e0d4";
+  ctx.font="bold 80px Georgia,serif";
+  ctx.fillText(snvD,54,262);
+
+  // Zone
+  ctx.fillStyle=n.cl;
+  ctx.font="bold 14px Georgia,serif";
+  ctx.fillText(n.zo,54,290);
+
+  // Orientation
+  ctx.fillStyle="#848678";
+  ctx.font="13px Georgia,serif";
+  ctx.fillText("→ "+n.fa,54,316);
+
+  // Anneau SNV (dessiné manuellement)
+  const cx=310,cy=220,r=55,sw=10;
+  const pct=(n.snv+50)/100;
+  // Fond anneau
+  ctx.strokeStyle="#21241b";
+  ctx.lineWidth=sw;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  // Arc coloré
+  ctx.strokeStyle=n.co;
+  ctx.lineWidth=sw;
+  ctx.lineCap="round";
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(0,Math.min(1,pct)));
+  ctx.stroke();
+  // Texte centré
+  ctx.fillStyle="#e2e0d4";
+  ctx.font="bold 22px Georgia,serif";
+  ctx.textAlign="center";
+  ctx.fillText(snvD,cx,cy+8);
+  ctx.textAlign="left";
+
+  // ── BLOC ki.S ──
+  if(k){
+    ctx.fillStyle="#080f1e";
+    ctx.strokeStyle="#2a5faa55";
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(394,140,372,100,14);ctx.fill();ctx.stroke();
+
+    ctx.fillStyle="#4a8fe0";
+    ctx.font="bold 10px Georgia,serif";
+    ctx.letterSpacing="2px";
+    ctx.fillText("KI.S",414,170);
+    ctx.letterSpacing="0px";
+
+    ctx.fillStyle="#e2e0d4";
+    ctx.font="bold 22px Georgia,serif";
+    ctx.fillText(k.pr,414,200);
+
+    if(k.dom){
+      ctx.fillStyle="#848678";
+      ctx.font="12px Georgia,serif";
+      ctx.fillText(k.dom,414,222);
+    }
+  }
+
+  // ── BLOC NEUROFLEX ──
+  if(nf!==null){
+    const nfColor=nf>=81?"#4a8830":nf>=61?"#c8b020":nf>=31?"#e08828":"#a82010";
+    ctx.fillStyle="#181b14";
+    ctx.strokeStyle=nfColor+"55";
+    ctx.lineWidth=1.5;
+    const bY=k?258:140;
+    ctx.beginPath();ctx.roundRect(394,bY,372,k?92:100,14);ctx.fill();ctx.stroke();
+
+    ctx.fillStyle="#72c44a";
+    ctx.font="bold 10px Georgia,serif";
+    ctx.letterSpacing="2px";
+    ctx.fillText("NEUROFLEX",414,bY+30);
+    ctx.letterSpacing="0px";
+
+    ctx.fillStyle="#e2e0d4";
+    ctx.font="bold 30px Georgia,serif";
+    ctx.fillText(nf,414,bY+66);
+
+    ctx.fillStyle="#848678";
+    ctx.font="12px Georgia,serif";
+    ctx.fillText("/ 100",414+ctx.measureText(nf+"").width+6,bY+66);
+  }
+
+  // ── PIED DE PAGE ──
+  ctx.strokeStyle="#21241b";
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,H-50);ctx.lineTo(W-34,H-50);ctx.stroke();
+
+  ctx.fillStyle="#2e3026";
+  ctx.font="12px Georgia,serif";
+  ctx.fillText("app MUR — Flexibilité Neuronale",34,H-22);
+
+  // Convertir en blob et partager
+  canvas.toBlob(blob=>{
+    if(!blob){showToast("Erreur image");return;}
+    const file=new File([blob],"mur-resultats.png",{type:"image/png"});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:"MUR — Mes résultats"})
+        .catch(e=>{if(e.name!=="AbortError")shareImageFallback(canvas,blob);});
+    } else if(navigator.share){
+      navigator.share({title:"MUR — Mes résultats",text:buildShareText()})
+        .catch(e=>{if(e.name!=="AbortError")shareImageFallback(canvas,blob);});
+    } else {
+      shareImageFallback(canvas,blob);
+    }
+  },"image/png");
+}
+
+
+function shareNF(){
+  const nf=getNF(),k=getKis(),n=getNow();
+  if(nf===null){showToast("Complétez ki.S + Ici & Maintenant d'abord !");return;}
+
+  const canvas=document.createElement("canvas");
+  const W=800,H=420;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext("2d");
+
+  // Couleur selon score
+  const nfColor=nf>=81?"#4a8830":nf>=61?"#c8b020":nf>=31?"#e08828":"#a82010";
+  const nfLabel=nf>=81?"Excellente":nf>=61?"Bonne":nf>=31?"Modérée":"Faible";
+
+  // Fond
+  const grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,"#0d0f0b");
+  grad.addColorStop(1,"#181b14");
+  ctx.fillStyle=grad;
+  ctx.roundRect(0,0,W,H,24);ctx.fill();
+
+  // Bordure colorée
+  ctx.strokeStyle=nfColor+"99";ctx.lineWidth=2;
+  ctx.roundRect(1,1,W-2,H-2,24);ctx.stroke();
+
+  // Logo + titre
+  ctx.fillStyle="#72c44a";ctx.font="bold 13px Georgia,serif";
+  ctx.letterSpacing="6px";ctx.fillText("M U R",34,44);ctx.letterSpacing="0px";
+  ctx.strokeStyle="#21241b";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,54);ctx.lineTo(W-34,54);ctx.stroke();
+
+  // Date
+  const d=new Date();
+  ctx.fillStyle="#848678";ctx.font="13px Georgia,serif";
+  ctx.fillText(d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+" · "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}),34,78);
+
+  ctx.fillStyle="#e2e0d4";ctx.font="bold 26px Georgia,serif";
+  ctx.fillText("Mon score NeuroFlex",34,118);
+
+  // Grand anneau central
+  const cx=200,cy=265,r=110,sw=18;
+  ctx.strokeStyle="#21241b";ctx.lineWidth=sw;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle=nfColor;ctx.lineWidth=sw;ctx.lineCap="round";
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*(nf/100));ctx.stroke();
+  ctx.fillStyle="#e2e0d4";ctx.font="bold 72px Georgia,serif";ctx.textAlign="center";
+  ctx.fillText(nf,cx,cy+24);
+  ctx.fillStyle="#848678";ctx.font="16px Georgia,serif";
+  ctx.fillText("/ 100",cx,cy+52);
+  ctx.textAlign="left";
+
+  // Label qualité — à droite de l'anneau, pas en dessous
+  ctx.fillStyle=nfColor;ctx.font="bold 16px Georgia,serif";
+  ctx.textAlign="left";
+  ctx.fillText(nfLabel,380,cy-10);
+  ctx.fillStyle="#848678";ctx.font="14px Georgia,serif";
+  ctx.fillText("capacité d'adaptation",380,cy+14);
+
+  // Barre progression 4 zones à droite
+  const bx=380,by=155,bw=360,bh=16,br=8;
+  const zones=[{p:30,c:"#a82010",l:"Faible"},{p:30,c:"#e08828",l:"Modérée"},{p:20,c:"#c8b020",l:"Bonne"},{p:20,c:"#4a8830",l:"Excellente"}];
+  let bxo=bx;
+  zones.forEach(z=>{
+    const zw=bw*(z.p/100);
+    ctx.fillStyle=z.c;
+    ctx.beginPath();ctx.roundRect(bxo,by,zw,bh,br);ctx.fill();
+    bxo+=zw+2;
+  });
+  // Curseur position
+  const cursorX=bx+(nf/100)*bw;
+  ctx.fillStyle="#e2e0d4";
+  ctx.beginPath();ctx.arc(cursorX,by+bh/2,10,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#0d0f0b";ctx.font="bold 10px Georgia,serif";ctx.textAlign="center";
+  ctx.fillText(nf,cursorX,by+bh/2+4);ctx.textAlign="left";
+
+  // Labels zones
+  ctx.font="11px Georgia,serif";
+  [{x:bx,l:"0"},{x:bx+bw*0.3,l:"30"},{x:bx+bw*0.6,l:"60"},{x:bx+bw*0.8,l:"80"},{x:bx+bw,l:"100"}].forEach(p=>{
+    ctx.fillStyle="#848678";ctx.textAlign="center";ctx.fillText(p.l,p.x,by+bh+18);
+  });
+  ctx.textAlign="left";
+
+  // Labels familles
+  const famLabels=[{x:bx,l:"FREINER",c:"#a82010"},{x:bx+bw*0.3+4,l:"RÉGULER",c:"#e08828"},{x:bx+bw*0.6+4,l:"ENTRETENIR",c:"#c8b020"},{x:bx+bw*0.8+4,l:"ACTIVER",c:"#4a8830"}];
+  famLabels.forEach(f=>{
+    ctx.fillStyle=f.c;ctx.font="bold 10px Georgia,serif";ctx.fillText(f.l,f.x,by-8);
+  });
+
+  // ki.S si disponible
+  if(k){
+    ctx.fillStyle="#181b14";ctx.strokeStyle="#2a5faa33";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(380,by+50,360,80,12);ctx.fill();ctx.stroke();
+    ctx.fillStyle="#4a8fe0";ctx.font="bold 10px Georgia,serif";ctx.letterSpacing="2px";ctx.fillText("KI.S",400,by+80);ctx.letterSpacing="0px";
+    ctx.fillStyle="#e2e0d4";ctx.font="bold 20px Georgia,serif";ctx.fillText(k.pr,400,by+110);
+    if(k.dom){ctx.fillStyle="#848678";ctx.font="12px Georgia,serif";ctx.fillText(k.dom,400,by+128);}
+  }
+
+  // Pied
+  ctx.strokeStyle="#21241b";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,H-46);ctx.lineTo(W-34,H-46);ctx.stroke();
+  ctx.fillStyle="#2e3026";ctx.font="12px Georgia,serif";
+  ctx.fillText("app MUR — Flexibilité Neuronale",34,H-20);
+
+  // Partager
+  canvas.toBlob(blob=>{
+    if(!blob){showToast("Erreur image");return;}
+    const file=new File([blob],"mur-neuroflex.png",{type:"image/png"});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:"Mon NeuroFlex MUR"})
+        .catch(e=>{if(e.name!=="AbortError")shareImageFallback(canvas,blob);});
+    } else if(navigator.share){
+      navigator.share({title:"Mon NeuroFlex MUR",text:"Mon score NeuroFlex : "+nf+"/100 ("+nfLabel+")\n\nTesté avec l'app MUR — Flexibilité Neuronale"})
+        .catch(e=>{if(e.name!=="AbortError")shareImageFallback(canvas,blob);});
+    } else {shareImageFallback(canvas,blob);}
+  },"image/png");
+}
+
+function shareImageFallback(canvas,blob){
+  const url=canvas.toDataURL("image/png");
+  const overlay=document.createElement("div");
+  overlay.style.cssText="position:fixed;inset:0;background:#000000dd;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:0";
+  const img=document.createElement("img");
+  img.src=url;
+  img.style.cssText="max-width:100%;max-height:55vh;border-radius:14px;box-shadow:0 8px 40px #000";
+  const hint=document.createElement("div");
+  hint.textContent="Appuyez longuement sur l'image → Enregistrer";
+  hint.style.cssText="color:#e2e0d4;font-family:Georgia,serif;font-size:13px;margin-top:14px;text-align:center;opacity:0.8";
+  // Bouton télécharger (marche sur desktop et Android)
+  const dlBtn=document.createElement("a");
+  dlBtn.href=url;dlBtn.download="mur-resultats.png";
+  dlBtn.textContent="⬇ Télécharger l'image";
+  dlBtn.style.cssText="margin-top:12px;padding:11px 24px;background:#181b14;border:1px solid #21241b;border-radius:20px;color:#e2e0d4;font-size:13px;font-family:Georgia,serif;text-decoration:none;display:block;text-align:center";
+  const closeBtn=document.createElement("button");
+  closeBtn.textContent="Fermer";
+  closeBtn.style.cssText="margin-top:10px;padding:11px 28px;background:#72c44a;border:none;border-radius:20px;color:#0d0f0b;font-size:14px;font-weight:700;cursor:pointer;font-family:Georgia,serif";
+  closeBtn.onclick=()=>overlay.remove();
+  overlay.append(img,hint,dlBtn,closeBtn);
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+  document.body.appendChild(overlay);
+}
 
 // ─── INIT ───
 initFromStorage();
