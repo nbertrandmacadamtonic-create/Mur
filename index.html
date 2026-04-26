@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0d0f0b"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MUR"/>
+<meta name="description" content="Testez votre flexibilité neuronale"/>
+
+<!-- Icône Apple -->
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="/>
+
+<!-- PWA Manifest -->
+<script>
+(function(){
+  const m={name:"MUR — Flexibilité Neuronale",short_name:"MUR",start_url:"./",display:"standalone",
+    background_color:"#0d0f0b",theme_color:"#0d0f0b",orientation:"portrait",
+    icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230d0f0b'/%3E%3Cpolygon points='256,50 350,150 256,140 162,150' fill='%2372c44a'/%3E%3Cpolygon points='162,150 256,140 256,300 90,272' fill='%2372c44a' opacity='0.6'/%3E%3Cpolygon points='350,150 256,140 256,300 422,272' fill='%2372c44a' opacity='0.75'/%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+  const b=new Blob([JSON.stringify(m)],{type:"application/json"});
+  const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);
+  document.head.appendChild(l);
+})();
+</script>
+
+<!-- Service Worker hors ligne -->
+<script>
+if("serviceWorker"in navigator){
+  const code=`const C="mur-v1";self.addEventListener("install",e=>{self.skipWaiting();});self.addEventListener("activate",e=>{e.waitUntil(clients.claim());});self.addEventListener("fetch",e=>{e.respondWith(fetch(e.request).catch(()=>new Response("",{status:200})));});`;
+  const b=new Blob([code],{type:"application/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(b)).catch(()=>{});
+}
+</script>
+<title>MUR — Flexibilité Neuronale</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#0d0f0b;font-family:Georgia,serif;color:#e2e0d4;}
+#app{max-width:420px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;background:#0d0f0b;position:relative;}
+.screen{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* NAV */
+.nav{display:flex;justify-content:space-around;padding:8px 0 14px;border-top:1px solid #21241b;background:#131510;flex-shrink:0;}
+.nav button{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-family:Georgia,serif;padding:2px 10px;transition:color 0.2s;}
+.nav button.active{color:#72c44a;}
+.nav button:not(.active){color:#2e3026;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid #21241b;flex-shrink:0;}
+.topbar button.back{background:none;border:none;color:#848678;font-size:20px;cursor:pointer;width:28px;}
+.topbar .title{font-size:11px;letter-spacing:2.5px;font-weight:700;font-family:Georgia,serif;}
+.topbar .right{width:28px;text-align:right;color:#848678;font-size:12px;}
+
+/* CARDS */
+.card{background:#181b14;border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+.card-btn{background:#081408;border:1px solid #4a883066;border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;margin-bottom:10px;}
+.card-btn.blue{background:#080f1e;border-color:#2a5faa66;}
+.card-btn.orange{background:#180e00;border-color:#b86a0866;}
+
+/* PROGRESS */
+.progress{display:flex;gap:2px;padding:0 16px;margin-top:10px;flex-shrink:0;}
+.progress-bar{flex:1;height:3px;border-radius:2px;background:#21241b;transition:background 0.3s;}
+.progress-bar.done{background:#72c44a;}
+.progress-bar.active{background:#72c44a88;}
+
+/* ANSWER BUTTONS */
+.answer-btn{background:#181b14;border:1.5px solid #21241b;border-radius:13px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s;width:100%;text-align:left;margin-bottom:9px;}
+.answer-btn.selected{border-color:var(--ac);}
+.answer-btn.faded{opacity:0.26;}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--ac);background:transparent;flex-shrink:0;transition:background 0.2s;}
+.dot.filled{background:var(--ac);}
+
+/* RING */
+.ring-wrap{position:relative;flex-shrink:0;}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+/* MISC */
+.label{font-size:9px;letter-spacing:2px;font-weight:700;}
+.big-num{font-size:52px;font-weight:900;line-height:1;}
+.zone-label{font-size:11px;letter-spacing:1.5px;font-weight:700;margin-top:4px;}
+.btn-primary{width:100%;padding:15px;border:none;border-radius:13px;cursor:pointer;color:#e2e0d4;font-size:15px;font-weight:700;font-family:Georgia,serif;display:flex;justify-content:space-between;align-items:center;}
+.tag{font-size:8px;letter-spacing:0.5px;font-weight:700;border-radius:4px;padding:2px 6px;}
+
+/* ORIENTATION BOX */
+.orientation-box{border-radius:14px;padding:18px;margin-bottom:14px;}
+.orientation-inner{background:#181b14;border-radius:10px;padding:10px 12px;margin-top:8px;}
+
+/* HIST ENTRY */
+.hist-entry{background:#181b14;border:1px solid #21241b;border-radius:13px;padding:14px;margin-bottom:10px;}
+.hist-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.hist-pill{border-radius:9px;padding:6px 12px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="screen" class="screen"></div>
+  <div id="nav" class="nav"></div>
+</div>
+
+<script>
+// ─── PALETTE ───
+const C={bg:"#0d0f0b",card:"#131510",cardAlt:"#181b14",border:"#21241b",
+  pB:"#2a5faa",pL:"#4a8fe0",pBg:"#080f1e",
+  fB:"#4a8830",fL:"#72c44a",fBg:"#081408",
+  oB:"#b86a08",oL:"#e08828",oBg:"#180e00",
+  rB:"#a82010",rL:"#cc3828",rBg:"#160400",
+  tx:"#e2e0d4",ts:"#848678",td:"#2e3026"};
+
+// ─── LOCALSTORAGE ───
+const LS="mur_data_v1";
+function load(){try{const r=localStorage.getItem(LS);return r?JSON.parse(r):{kisAns:null,nowAns:null,history:[]}}catch{return{kisAns:null,nowAns:null,history:[]}}}
+function save(d){try{localStorage.setItem(LS,JSON.stringify(d))}catch{}}
+
+// ─── SVG FIGURES ───
+function svgFigPosé(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 68 68" fill="none">
+<circle cx="34" cy="11" r="9" fill="#6aaef0"/><ellipse cx="34" cy="9" rx="6" ry="4" fill="#8acaff" opacity="0.5"/>
+<polygon points="26,20 42,20 46,34 22,34" fill="#3a7bd8"/><polygon points="26,20 42,20 34,26" fill="#6aaef0" opacity="0.6"/>
+<polygon points="22,34 46,34 42,40 26,40" fill="#2a5faa" opacity="0.9"/>
+<polygon points="26,22 8,27 8,33 24,30" fill="#4a8fe0" opacity="0.85"/><polygon points="8,27 2,30 3,35 8,33" fill="#2a5faa" opacity="0.8"/>
+<polygon points="42,22 60,27 60,33 44,30" fill="#3a7bd8" opacity="0.85"/><polygon points="60,27 66,30 65,35 60,33" fill="#2a5faa" opacity="0.8"/>
+<polygon points="22,38 34,40 30,56 14,52" fill="#3a7bd8" opacity="0.9"/><polygon points="46,38 34,40 38,56 54,52" fill="#2a5faa" opacity="0.9"/>
+<polygon points="14,50 30,56 26,62 10,58" fill="#1a4090" opacity="0.9"/><polygon points="54,50 38,56 42,62 58,58" fill="#1a4090" opacity="0.9"/>
+</svg>`}
+
+function svgFigFunam(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 68 68" fill="none">
+<circle cx="34" cy="8" r="8" fill="#90da60"/><ellipse cx="34" cy="6" rx="5" ry="3" fill="#b0f080" opacity="0.5"/>
+<polygon points="28,16 40,16 42,30 32,32 26,28" fill="#5aaa38"/><polygon points="28,16 40,16 34,21" fill="#90da60" opacity="0.55"/>
+<polygon points="26,28 42,30 38,36 28,36" fill="#3a8828" opacity="0.9"/>
+<polygon points="28,18 6,21 6,29 26,24" fill="#6aba48" opacity="0.9"/><polygon points="6,21 0,24 0,30 6,29" fill="#4a9830" opacity="0.8"/>
+<polygon points="40,18 62,20 62,28 42,23" fill="#4a9830" opacity="0.85"/><polygon points="62,20 68,23 68,29 62,28" fill="#3a8828" opacity="0.8"/>
+<polygon points="28,34 34,36 30,52 18,48" fill="#5aaa38"/><polygon points="34,36 40,34 44,52 32,54" fill="#3a8828"/>
+<polygon points="18,46 30,52 26,58 16,54" fill="#2a7020" opacity="0.9"/><polygon points="32,52 44,52 42,58 30,58" fill="#2a7020" opacity="0.9"/>
+<line x1="0" y1="42" x2="68" y2="42" stroke="#6aba48" stroke-width="1.2" opacity="0.28"/>
+</svg>`}
+
+function svgFigTension(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 68 68" fill="none">
+<circle cx="36" cy="8" r="8" fill="#f0a040"/><ellipse cx="36" cy="6" rx="5" ry="3" fill="#ffc870" opacity="0.5"/>
+<polygon points="30,16 44,18 46,32 32,34 28,28" fill="#d87818"/><polygon points="30,16 44,18 36,22" fill="#f0a040" opacity="0.55"/>
+<polygon points="28,28 46,32 42,38 28,38" fill="#b86808" opacity="0.9"/>
+<polygon points="30,18 14,11 12,20 28,22" fill="#e08828" opacity="0.9"/><polygon points="14,11 7,8 7,16 12,20" fill="#c07010" opacity="0.85"/>
+<polygon points="44,20 58,24 58,32 44,28" fill="#c07010" opacity="0.85"/>
+<polygon points="30,36 36,38 28,54 16,50" fill="#d07818" transform="rotate(-8,24,45)"/>
+<polygon points="36,38 44,36 48,52 36,56" fill="#b86808" transform="rotate(5,42,47)"/>
+<polygon points="16,48 28,54 24,60 14,56" fill="#906008" opacity="0.9"/><polygon points="36,54 48,52 46,58 34,58" fill="#906008" opacity="0.9"/>
+</svg>`}
+
+function svgFigCalme(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 68 68" fill="none">
+<circle cx="33" cy="9" r="8" fill="#7abcf8"/><ellipse cx="33" cy="7" rx="5" ry="3" fill="#a0d4ff" opacity="0.5"/>
+<polygon points="27,17 39,17 42,32 30,34 24,30" fill="#4a8fe0"/><polygon points="27,17 39,17 33,23" fill="#7abcf8" opacity="0.55"/>
+<polygon points="24,30 42,32 38,38 26,38" fill="#3a7bd8" opacity="0.9"/>
+<polygon points="27,19 14,26 16,34 26,28" fill="#5a9fe8" opacity="0.8"/><polygon points="39,19 50,24 48,32 40,26" fill="#4a8fe0" opacity="0.8"/>
+<polygon points="26,36 32,38 28,54 18,51" fill="#4a8fe0"/><polygon points="32,38 38,36 40,54 30,56" fill="#3a7bd8"/>
+<polygon points="18,49 28,54 24,60 14,56" fill="#2a5faa" opacity="0.9"/><polygon points="30,54 40,54 38,60 28,60" fill="#2a5faa" opacity="0.9"/>
+</svg>`}
+
+function svgFigDebord(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 68 68" fill="none">
+<circle cx="38" cy="9" r="8" fill="#e06050"/><ellipse cx="38" cy="7" rx="5" ry="3" fill="#ff8878" opacity="0.5"/>
+<polygon points="32,17 46,21 48,35 34,37 28,31" fill="#c83828"/><polygon points="32,17 46,21 38,23" fill="#e06050" opacity="0.55"/>
+<polygon points="28,31 48,35 44,41 28,41" fill="#a81818" opacity="0.9"/>
+<polygon points="32,19 12,13 10,23 28,23" fill="#d04030" opacity="0.9"/><polygon points="12,13 4,9 4,19 10,23" fill="#a82018" opacity="0.85"/>
+<polygon points="46,23 60,16 62,26 46,29" fill="#a82018" opacity="0.85"/>
+<polygon points="34,37 42,39 32,57 18,53" fill="#c03020" transform="rotate(-16,26,47)"/>
+<polygon points="42,39 48,37 54,55 42,59" fill="#901818" transform="rotate(11,48,49)"/>
+<polygon points="18,51 32,57 28,63 16,61" fill="#801010" opacity="0.9"/><polygon points="42,57 54,55 52,61 40,61" fill="#801010" opacity="0.9"/>
+</svg>`}
+
+// ─── ORIGAMI ICONS ───
+function svgIcoActiver(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
+<polygon points="22,2 40,38 4,38" fill="#1a4898" opacity="0.95"/>
+<polygon points="22,2 40,38 22,26" fill="#2a6acc" opacity="0.9"/>
+<polygon points="22,2 4,38 22,26" fill="#3a8ae8" opacity="0.75"/>
+<polygon points="22,26 40,38 4,38" fill="#4a9af8" opacity="0.3"/></svg>`}
+
+function svgIcoEntretenir(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
+<polygon points="22,3 34,13 30,27 22,31 14,27 10,13" fill="#286820" opacity="0.95"/>
+<polygon points="22,3 10,13 22,18" fill="#4aaa30" opacity="0.8"/>
+<polygon points="22,3 34,13 22,18" fill="#388828" opacity="0.9"/>
+<polygon points="10,13 14,27 22,18" fill="#3a9828" opacity="0.75"/>
+<polygon points="34,13 30,27 22,18" fill="#1a5810" opacity="0.9"/>
+<polygon points="22,31 26,37 22,42 18,37" fill="#3a9828" opacity="0.9"/>
+<polygon points="22,31 26,37 22,38" fill="#50b840" opacity="0.65"/>
+<polygon points="22,31 18,37 22,38" fill="#286820" opacity="0.85"/></svg>`}
+
+function svgIcoRéguler(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
+<polygon points="22,2 40,15 34,36 10,36 4,15" fill="#904808" opacity="0.95"/>
+<polygon points="22,2 4,15 22,19" fill="#e09020" opacity="0.85"/>
+<polygon points="22,2 40,15 22,19" fill="#c07010" opacity="0.9"/>
+<polygon points="4,15 10,36 22,19" fill="#b06010" opacity="0.8"/>
+<polygon points="40,15 34,36 22,19" fill="#703808" opacity="0.95"/>
+<polygon points="10,36 34,36 22,19" fill="#d08018" opacity="0.3"/></svg>`}
+
+function svgIcoFreiner(sz){return`<svg width="${sz}" height="${sz}" viewBox="0 0 44 44">
+<polygon points="4,4 22,4 22,22 4,22" fill="#7a0808" opacity="0.95"/>
+<polygon points="22,4 40,4 40,22 22,22" fill="#c82820" opacity="0.9"/>
+<polygon points="4,22 22,22 22,40 4,40" fill="#d03828" opacity="0.8"/>
+<polygon points="22,22 40,22 40,40 22,40" fill="#580808" opacity="0.95"/>
+<polygon points="4,4 40,4 22,22" fill="#f06050" opacity="0.18"/>
+<polygon points="40,4 40,40 22,22" fill="#400808" opacity="0.35"/>
+<polygon points="4,40 40,40 22,22" fill="#780818" opacity="0.25"/></svg>`}
+
+function svgFamilyIcon(id,sz){
+  if(id==="ACTIVER")return svgIcoActiver(sz);
+  if(id==="ENTRETENIR")return svgIcoEntretenir(sz);
+  if(id==="RÉGULER")return svgIcoRéguler(sz);
+  if(id==="FREINER")return svgIcoFreiner(sz);
+  return"";
+}
+
+function svgMurLogo(sz,col){col=col||"#72c44a";return`<svg width="${sz}" height="${sz}" viewBox="0 0 28 28" fill="none">
+<polygon points="14,2 20,8 14,7 8,8" fill="${col}" opacity="0.95"/>
+<polygon points="8,8 14,7 14,18 4,16" fill="${col}" opacity="0.62"/>
+<polygon points="20,8 14,7 14,18 24,16" fill="${col}" opacity="0.78"/>
+<polygon points="4,16 14,18 12,26 2,24" fill="${col}" opacity="0.42"/>
+<polygon points="24,16 14,18 16,26 26,24" fill="${col}" opacity="0.52"/></svg>`}
+
+function svgKiSHero(profile,sz){
+  sz=sz||216;
+  const cx=sz/2,cy=sz/2,R=88;
+  const dots=[{a:0,c:"#e08828",r:5.5},{a:30,c:"#f0b040",r:4},{a:60,c:"#5cba48",r:5},
+    {a:90,c:"#78d458",r:4},{a:120,c:"#4da838",r:5.5},{a:150,c:"#3a7bd8",r:5.5},
+    {a:180,c:"#5a9ff0",r:4},{a:210,c:"#c03020",r:4.5},{a:240,c:"#d84030",r:3.5},
+    {a:270,c:"#e08828",r:5.5},{a:300,c:"#c07010",r:4},{a:330,c:"#f0b048",r:4.5}];
+  const fc=profile==="POSÉ"?"#5a9ff0":profile==="FONCEUR"?"#e08828":"#78d458";
+  const fd=profile==="POSÉ"?"#2a5faa":profile==="FONCEUR"?"#b06008":"#3a8828";
+  const oy=cy-56;
+  let dotsSvg=dots.map(d=>{
+    const rad=(d.a-90)*Math.PI/180;
+    const x=cx+R*Math.cos(rad),y=cy+R*Math.sin(rad);
+    return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${d.r}" fill="${d.c}" opacity="0.94"/>`;
+  }).join('');
+  const tx=cx-30,ty=oy;
+  return`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">
+<circle cx="${cx}" cy="${cy}" r="${R+6}" fill="none" stroke="#252820" stroke-width="0.8" opacity="0.6"/>
+${dotsSvg}
+<line x1="${cx-70}" y1="${oy+68}" x2="${cx+70}" y2="${oy+68}" stroke="${fc}" stroke-width="1.4" opacity="0.22"/>
+<g transform="translate(${tx},${ty})">
+<circle cx="30" cy="10" r="11" fill="${fc}" opacity="0.92"/>
+<ellipse cx="30" cy="7" rx="7" ry="4" fill="#ffffff" opacity="0.15"/>
+<polygon points="22,21 38,21 40,40 30,42 20,40" fill="${fc}" opacity="0.86"/>
+<polygon points="22,21 38,21 30,27" fill="#ffffff" opacity="0.12"/>
+<polygon points="22,23 -6,19 -6,27 20,29" fill="${fd}" opacity="0.92"/>
+<polygon points="-6,19 -14,22 -13,28 -6,27" fill="${fc}" opacity="0.72"/>
+<polygon points="38,23 66,19 66,27 40,29" fill="${fc}" opacity="0.82"/>
+<polygon points="66,19 74,22 73,28 66,27" fill="${fd}" opacity="0.78"/>
+<polygon points="20,40 30,42 24,64 10,60" fill="${fc}" opacity="0.86"/>
+<polygon points="30,42 40,40 44,64 30,66" fill="${fd}" opacity="0.88"/>
+<polygon points="10,58 24,64 20,70 8,66" fill="${fd}" opacity="0.92"/>
+<polygon points="30,64 44,64 42,70 28,70" fill="${fd}" opacity="0.9"/>
+</g></svg>`;
+}
+
+function svgRing(pct,co,sz,sw){
+  sz=sz||160;sw=sw||14;
+  const r=sz/2-sw,ci=2*Math.PI*r;
+  const offset=ci*(1-Math.max(0,Math.min(1,pct)));
+  return`<svg width="${sz}" height="${sz}" style="transform:rotate(-90deg)">
+<circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="#21241b" stroke-width="${sw}"/>
+<circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="${co}" stroke-width="${sw}"
+  stroke-dasharray="${ci.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round"/></svg>`;
+}
+
+// ─── DATA ───
+const KIS_Q=[
+  {th:"Élan",q:"Face à une situation nouvelle, vous avez tendance à…",a:[{l:"Agir vite",t:"A"},{l:"Vous ajuster",t:"F"},{l:"Observer d'abord",t:"P"}]},
+  {th:"Rythme",q:"Votre rythme naturel est plutôt…",a:[{l:"Rapide",t:"A"},{l:"Variable",t:"F"},{l:"Calme",t:"P"}]},
+  {th:"Pression",q:"Quand la pression monte, vous avez tendance à…",a:[{l:"Pousser encore",t:"A"},{l:"Vous adapter",t:"F"},{l:"Vous protéger",t:"P"}]},
+  {th:"Décision",q:"Quand il faut choisir, vous êtes plutôt…",a:[{l:"Direct(e)",t:"A"},{l:"Souple",t:"F"},{l:"Prudent(e)",t:"P"}]},
+  {th:"Imprévu",q:"Face à l'imprévu, vous cherchez d'abord à…",a:[{l:"Réagir",t:"A"},{l:"Composer",t:"F"},{l:"Sécuriser",t:"P"}]},
+  {th:"Contrôle",q:"Dans votre fonctionnement habituel, vous êtes plutôt…",a:[{l:"Moteur",t:"A"},{l:"Régulateur",t:"F"},{l:"Contenant",t:"P"}]},
+  {th:"Énergie",q:"Votre énergie naturelle est plutôt…",a:[{l:"Projetée",t:"A"},{l:"Modulable",t:"F"},{l:"Retenue",t:"P"}]},
+  {th:"Conflit",q:"Dans un désaccord, vous avez tendance à…",a:[{l:"Affronter",t:"A"},{l:"Négocier",t:"F"},{l:"Éviter",t:"P"}]},
+  {th:"Fatigue",q:"Quand vous êtes fatigué(e), vous avez tendance à…",a:[{l:"Continuer",t:"A"},{l:"Moduler",t:"F"},{l:"Couper",t:"P"}]},
+  {th:"Changement",q:"Si une stratégie ne marche pas, vous avez tendance à…",a:[{l:"Insister",t:"A"},{l:"Réorienter",t:"F"},{l:"Suspendre",t:"P"}]},
+  {th:"Temps",q:"Vous vous reconnaissez plutôt dans…",a:[{l:"L'urgence",t:"A"},{l:"Le bon moment",t:"F"},{l:"La durée",t:"P"}]},
+  {th:"Groupe",q:"Dans un groupe, vous avez tendance à…",a:[{l:"Impulser",t:"A"},{l:"Relier",t:"F"},{l:"Stabiliser",t:"P"}]},
+  {th:"Tension",q:"Quand quelque chose vous travaille, vous avez tendance à…",a:[{l:"Extérioriser",t:"A"},{l:"Transformer",t:"F"},{l:"Garder",t:"P"}]},
+  {th:"Souplesse",q:"Globalement, vous vous sentez plutôt…",a:[{l:"Allant(e)",t:"A"},{l:"Souple",t:"F"},{l:"Contenu(e)",t:"P"}]},
+  {th:"Récup.",q:"Pour récupérer, vous avez besoin de…",a:[{l:"Bouger",t:"A"},{l:"Alterner",t:"F"},{l:"Vous poser",t:"P"}]}
+];
+const TS={P:1,F:0,A:-1};
+
+const NOW_Q=[
+  {q:"Comment est votre énergie, là, maintenant ?",a:[
+    {l:"Elle est basse, j'ai besoin de ralentir",v:-2,c:C.pB,fig:"posé"},
+    {l:"Elle est calme, un peu en retrait",v:-1,c:C.pL,fig:"calme"},
+    {l:"Elle est juste, disponible",v:0,c:C.fB,fig:"funam"},
+    {l:"Elle monte, je sens de la tension",v:+1,c:C.oL,fig:"tension"},
+    {l:"Elle déborde, ça va trop vite",v:+2,c:C.rB,fig:"debord"}]},
+  {q:"Comment réagissez-vous face aux imprévus ?",a:[
+    {l:"Je me fige, j'ai du mal à réagir",v:-2,c:C.pB,fig:"posé"},
+    {l:"Je prends le temps d'analyser",v:-1,c:C.pL,fig:"calme"},
+    {l:"Je m'adapte naturellement",v:0,c:C.fB,fig:"funam"},
+    {l:"Je réagis vite, parfois trop",v:+1,c:C.oL,fig:"tension"},
+    {l:"Je m'emballe facilement",v:+2,c:C.rB,fig:"debord"}]},
+  {q:"Votre concentration en ce moment ?",a:[
+    {l:"Très difficile, l'esprit vague",v:-2,c:C.pB,fig:"posé"},
+    {l:"Un peu dispersée",v:-1,c:C.pL,fig:"calme"},
+    {l:"Bonne, je suis présent(e)",v:0,c:C.fB,fig:"funam"},
+    {l:"Intense, presque en surchauffe",v:+1,c:C.oL,fig:"tension"},
+    {l:"Impossible à poser",v:+2,c:C.rB,fig:"debord"}]},
+  {q:"Comment dormez-vous ces derniers jours ?",a:[
+    {l:"Trop, je n'arrive pas à me lever",v:-2,c:C.pB,fig:"posé"},
+    {l:"Calme mais pas vraiment reposé(e)",v:-1,c:C.pL,fig:"calme"},
+    {l:"Bien, je me réveille frais/fraîche",v:0,c:C.fB,fig:"funam"},
+    {l:"Agité(e), pensées actives la nuit",v:+1,c:C.oL,fig:"tension"},
+    {l:"À peine, mon cerveau ne s'arrête pas",v:+2,c:C.rB,fig:"debord"}]}
+];
+
+function figSvg(name,sz){
+  if(name==="posé")return svgFigPosé(sz);
+  if(name==="calme")return svgFigCalme(sz);
+  if(name==="funam")return svgFigFunam(sz);
+  if(name==="tension")return svgFigTension(sz);
+  if(name==="debord")return svgFigDebord(sz);
+  return"";
+}
+
+// ─── CALCULS ───
+function calcKiS(ans){
+  const p=ans.filter(a=>a==="P").length,f=ans.filter(a=>a==="F").length,a=ans.filter(a=>a==="A").length;
+  const sc=ans.reduce((s,x)=>s+TS[x],0);
+  let pr,dom,co,cl,bg;
+  if(sc>=8){pr="POSÉ";dom=null;co=C.pB;cl=C.pL;bg=C.pBg;}
+  else if(sc<=-8){pr="FONCEUR";dom=null;co=C.oB;cl=C.oL;bg=C.oBg;}
+  else if(sc>2){pr="FUNAMBULE";dom="à dominante Posé";co=C.fB;cl=C.fL;bg=C.fBg;}
+  else if(sc<-2){pr="FUNAMBULE";dom="à dominante Fonceur";co=C.fB;cl=C.fL;bg=C.fBg;}
+  else{pr="FUNAMBULE";dom="équilibré";co=C.fB;cl=C.fL;bg=C.fBg;}
+  const info={POSÉ:{te:"Prendre le temps d'analyser",ri:"Immobilisme sous pression",re:"Stabilité et profondeur",tx:"Vous avancez avec méthode et recul. Votre force est la profondeur. Votre défi est de ne pas rester trop longtemps en attente."},
+    FUNAMBULE:{te:"S'adapter en continu",ri:"Dispersion ou surcharge",re:"Flexibilité et lecture fine",tx:"Vous jonglez avec les contraintes. Votre force est l'adaptabilité. Votre défi est de trouver votre axe stable."},
+    FONCEUR:{te:"Aller vers l'action",ri:"Surcharge et épuisement",re:"Énergie et élan",tx:"Vous avez de l'énergie et de l'élan. Votre force est d'avancer. Votre défi est de doser."}}[pr];
+  return{pr,dom,sc,pC:p,fC:f,aC:a,co,cl,bg,...info};
+}
+
+function calcNow(sc){
+  const raw=sc.reduce((a,b)=>a+b,0),snv=Math.round((raw/8)*50);
+  if(snv>=15)return{snv,zo:"ZONE ROUGE",fa:"FREINER",co:C.rB,cl:C.rL,bg:C.rBg,de:"Votre système est en surchauffe. Il a besoin d'être freiné pour éviter l'épuisement.",co2:"Cherchez des exercices qui calment et ralentissent votre système."};
+  if(snv>=5)return{snv,zo:"ZONE ORANGE",fa:"RÉGULER",co:C.oB,cl:C.oL,bg:C.oBg,de:"Votre système est en train de monter. Il reste encore adaptable, mais la tension commence à s'installer.",co2:"Cherchez des exercices qui diminuent la tension sans casser votre dynamique."};
+  if(snv>=-4)return{snv,zo:"ZONE VERTE",fa:"ENTRETENIR",co:C.fB,cl:C.fL,bg:C.fBg,de:"Votre système est équilibré. Vous êtes dans votre zone optimale de fonctionnement.",co2:"Maintenez cet état. Cherchez des exercices de stabilisation et d'ancrage."};
+  return{snv,zo:"ZONE BLEUE",fa:"ACTIVER",co:C.pB,cl:C.pL,bg:C.pBg,de:"Votre système est en veille. Il a besoin d'activation pour retrouver son élan.",co2:"Cherchez des exercices qui stimulent doucement sans forcer."};
+}
+function calcNF(ks,ns){return Math.round((1-Math.abs(ks)/15)*50+(1-Math.abs(ns)/50)*50);}
+
+// ─── STATE ───
+let state={
+  screen:"home",nav:"home",
+  kisAns:null,nowAns:null,history:[],
+  kisStep:0,kisAnswers:[],kisSel:null,
+  nowStep:0,nowAnswers:[],nowSel:null
+};
+function getKis(){return state.kisAns?calcKiS(state.kisAns):null;}
+function getNow(){return state.nowAns?calcNow(state.nowAns):null;}
+function getNF(){const k=getKis(),n=getNow();return(k&&n)?calcNF(k.sc,n.snv):null;}
+
+function initFromStorage(){
+  const d=load();
+  if(d.kisAns)state.kisAns=d.kisAns;
+  if(d.nowAns)state.nowAns=d.nowAns;
+  if(d.history)state.history=d.history;
+}
+
+function persist(){save({kisAns:state.kisAns,nowAns:state.nowAns,history:state.history});}
+
+function go(screen){
+  state.screen=screen;
+  if(["home","history","conseils","about"].includes(screen))state.nav=screen;
+  render();
+}
+
+// ─── NAV ───
+function renderNav(){
+  const items=[
+    {id:"home",lb:"Accueil",ic:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'},
+    {id:"history",lb:"Historique",ic:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>'},
+    {id:"conseils",lb:"Conseils",ic:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'},
+    {id:"about",lb:"À propos",ic:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>'}
+  ];
+  const nav=document.getElementById('nav');
+  const navScreens=["home","history","conseils","about"];
+  nav.style.display=navScreens.includes(state.screen)?"flex":"none";
+  nav.innerHTML=items.map(n=>`
+    <button class="${state.nav===n.id?'active':''}" onclick="go('${n.id}')">
+      ${n.ic}<span>${n.lb}</span>
+    </button>`).join('');
+}
+
+// ─── TOPBAR helper ───
+function topBar(title,col,backFn,right){
+  return`<div class="topbar">
+    <button class="back" onclick="${backFn}">←</button>
+    <span class="title" style="color:${col||C.fL}">${title}</span>
+    <div class="right">${right||""}</div>
+  </div>`;
+}
+
+// ─── HOME ───
+function renderHome(){
+  const kis=getKis(),now=getNow(),nf=getNF();
+  const resetBtn=(kis||now)?`<button onclick="resetAll()" style="background:none;border:1px solid ${C.border};border-radius:8px;padding:4px 10px;color:${C.ts};font-size:10px;cursor:pointer;font-family:Georgia,serif">↺ Reset</button>`:`<div style="width:40px"></div>`;
+  return`
+  <div class="scroll" style="background:${C.bg}">
+    <div style="padding:18px 16px 16px;display:flex;flex-direction:column;align-items:center;border-bottom:1px solid ${C.border}">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:4px">
+        <div style="width:40px"></div>
+        ${svgMurLogo(32)}
+        ${resetBtn}
+      </div>
+      <div style="font-size:9px;letter-spacing:5px;color:${C.ts};margin-top:5px">MUR</div>
+      <div style="font-size:11px;letter-spacing:1.5px;color:${C.ts};margin-top:12px">TESTEZ VOTRE</div>
+      <div style="font-size:33px;font-weight:900;color:${C.tx};text-align:center;line-height:1.05;margin-top:3px;letter-spacing:0.5px">FLEXIBILITÉ<br/>NEURONALE</div>
+      <div style="font-size:12px;color:${C.ts};margin-top:9px;text-align:center;line-height:1.7">Prenez quelques minutes<br/>pour mieux vous connaître<br/>et choisir juste.</div>
+    </div>
+    <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+      <button class="card-btn blue" onclick="go('kis-quiz')">
+        <div style="display:flex;align-items:center;gap:14px">
+          ${svgFigPosé(66)}
+          <div>
+            <div style="font-size:17px;font-weight:700;color:${C.tx}">ki.S</div>
+            <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${kis?kis.pr+(kis.dom?" — "+kis.dom:""):"Votre tendance de fond"}</div>
+          </div>
+        </div>
+        <span style="color:${C.ts};font-size:22px">›</span>
+      </button>
+      <button class="card-btn" onclick="go('now-quiz')">
+        <div style="display:flex;align-items:center;gap:14px">
+          ${now?svgFamilyIcon(now.fa,52):svgFigFunam(66)}
+          <div>
+            <div style="font-size:17px;font-weight:700;color:${C.tx}">Ici Maintenant</div>
+            <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${now?now.fa:"Votre état du moment"}</div>
+          </div>
+        </div>
+        <span style="color:${C.ts};font-size:22px">›</span>
+      </button>
+      <div class="card" style="display:flex;align-items:center;gap:16px">
+        <div style="position:relative;width:66px;height:66px;flex-shrink:0">
+          ${svgRing(nf?nf/100:0,nf?C.fL:C.td,66,7)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:16px;font-weight:900;color:${nf?C.tx:C.ts}">${nf?nf:"—"}</div>
+            ${nf?`<div style="font-size:8px;color:${C.ts}">/100</div>`:""}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:${C.tx}">NeuroFlex</div>
+          <div style="font-size:12px;color:${C.ts};margin-top:3px;line-height:1.5">${nf?(nf>=75?"Excellente":nf>=55?"Bonne":nf>=35?"Moyenne":"Faible")+" capacité d'adaptation":"Votre niveau d'adaptation"}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── KI.S QUIZ ───
+function renderKiSQuiz(){
+  const q=KIS_Q[state.kisStep];
+  const COL={A:C.oB,F:C.fB,P:C.pB};
+  const FIGS={A:"tension",F:"funam",P:"posé"};
+  const bars=KIS_Q.map((_,i)=>`<div class="progress-bar ${i<state.kisStep?'done':i===state.kisStep?'active':''}"></div>`).join('');
+  const answers=q.a.map(a=>{
+    const col=COL[a.t];const isSel=state.kisSel===a.t;
+    return`<button class="answer-btn ${isSel?'selected':state.kisSel&&!isSel?'faded':''}" 
+      style="--ac:${col};${isSel?'background:'+col+'22;border-color:'+col:''}"
+      onclick="pickKiS('${a.t}')">
+      <div class="dot ${isSel?'filled':''}" style="--ac:${col}"></div>
+      <div style="flex:1;color:${isSel?C.tx:C.ts};font-size:15px">${a.l}</div>
+      ${figSvg(FIGS[a.t],52)}
+    </button>`;
+  }).join('');
+  return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
+      <div style="text-align:center">${svgMurLogo(20,C.fL)}<div style="font-size:10px;letter-spacing:2px;color:${C.fL};font-weight:700;margin-top:2px">KI.S</div></div>
+      <span style="font-size:12px;color:${C.ts}">${state.kisStep+1}/${KIS_Q.length}</span>
+    </div>
+    <div class="progress">${bars}</div>
+    <div class="scroll" style="padding:16px">
+      <div style="font-size:10px;letter-spacing:2px;color:${C.ts};margin-bottom:7px">${q.th.toUpperCase()}</div>
+      <div style="font-size:19px;font-weight:700;color:${C.tx};line-height:1.4;margin-bottom:20px">${q.q}</div>
+      ${answers}
+    </div>`;
+}
+
+function pickKiS(t){
+  if(state.kisSel!==null)return;
+  state.kisSel=t;
+  render();
+  setTimeout(()=>{
+    const na=[...state.kisAnswers,t];
+    if(state.kisStep+1<KIS_Q.length){
+      state.kisAnswers=na;state.kisStep++;state.kisSel=null;render();
+    } else {
+      state.kisAns=na;state.kisAnswers=[];state.kisStep=0;state.kisSel=null;
+      const k=calcKiS(na),n=getNow(),nfv=(k&&n)?calcNF(k.sc,n.snv):null;
+      state.history.push({date:Date.now(),kis:k,now:n,nf:nfv});
+      persist();go('kis-result');
+    }
+  },360);
+}
+
+// ─── KI.S RESULT ───
+function renderKiSResult(){
+  const r=getKis();if(!r)return"";
+  const traits=[{lb:"Tendance naturelle",v:r.te,c:C.oL},{lb:"Risque principal",v:r.ri,c:C.oB},{lb:"Ressource clé",v:r.re,c:C.fL}];
+  const traitHtml=traits.map((t,i)=>`
+    <div style="display:flex;gap:12px;align-items:flex-start;${i<2?"margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid "+C.border:""}">
+      <div style="width:12px;height:12px;border-radius:50%;background:${t.c};margin-top:3px;flex-shrink:0"></div>
+      <div>
+        <div style="font-size:11px;color:${t.c};font-weight:700;margin-bottom:2px">${t.lb}</div>
+        <div style="font-size:14px;color:${C.tx}">${t.v}</div>
+      </div>
+    </div>`).join('');
+  return`
+    ${topBar("ki.S",r.cl,"go('home')")}
+    <div class="scroll" style="padding:14px 16px">
+      <div style="display:flex;justify-content:center;margin-bottom:8px">${svgKiSHero(r.pr,216)}</div>
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:28px;font-weight:900;color:${r.cl};letter-spacing:2px">${r.pr}</div>
+        ${r.dom?`<div style="font-size:11px;color:${C.ts};margin-top:4px;letter-spacing:1.5px">${r.dom.toUpperCase()}</div>`:""}
+      </div>
+      <div class="card" style="margin-bottom:12px">${traitHtml}</div>
+      <div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:${C.ts};line-height:1.8">${r.tx}</div></div>
+      <button class="btn-primary" style="background:${r.co}" onclick="go('home')"><span>Retour à l'accueil</span><span>→</span></button>
+    </div>`;
+}
+
+// ─── NOW QUIZ ───
+function renderNowQuiz(){
+  const q=NOW_Q[state.nowStep];
+  const dots=NOW_Q.map((_,i)=>`<div style="width:${i===state.nowStep?20:8}px;height:8px;border-radius:4px;background:${i<=state.nowStep?C.fL:C.border};opacity:${i>state.nowStep?0.3:1};transition:all 0.3s"></div>`).join('');
+  const answers=q.a.map(a=>{
+    const isSel=state.nowSel===a.v;
+    return`<button class="answer-btn ${isSel?'selected':state.nowSel!==null&&!isSel?'faded':''}"
+      style="--ac:${a.c};${isSel?'background:'+a.c+'22;border-color:'+a.c:''}"
+      onclick="pickNow(${a.v})">
+      <div class="dot ${isSel?'filled':''}" style="--ac:${a.c}"></div>
+      <div style="flex:1;color:${isSel?C.tx:C.ts};font-size:14px">${a.l}</div>
+      ${figSvg(a.fig,52)}
+    </button>`;
+  }).join('');
+  return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
+      <div style="text-align:center">${svgMurLogo(20,C.fL)}<div style="font-size:10px;letter-spacing:2px;color:${C.fL};font-weight:700;margin-top:2px">ICI MAINTENANT</div></div>
+      <span style="font-size:12px;color:${C.ts}">${state.nowStep+1}/${NOW_Q.length}</span>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;padding:14px 0 0;flex-shrink:0">${dots}</div>
+    <div class="scroll" style="padding:18px 16px">
+      <div style="font-size:20px;font-weight:700;color:${C.tx};line-height:1.4;text-align:center;margin-bottom:20px">${q.q}</div>
+      ${answers}
+    </div>`;
+}
+
+function pickNow(v){
+  if(state.nowSel!==null)return;
+  state.nowSel=v;
+  render();
+  setTimeout(()=>{
+    const na=[...state.nowAnswers,v];
+    if(state.nowStep+1<NOW_Q.length){
+      state.nowAnswers=na;state.nowStep++;state.nowSel=null;render();
+    } else {
+      state.nowAns=na;state.nowAnswers=[];state.nowStep=0;state.nowSel=null;
+      const k=getKis(),n=calcNow(na),nfv=(k&&n)?calcNF(k.sc,n.snv):null;
+      state.history.push({date:Date.now(),kis:k,now:n,nf:nfv});
+      persist();go('now-result');
+    }
+  },360);
+}
+
+// ─── NOW RESULT ───
+function renderNowResult(){
+  const r=getNow();if(!r)return"";
+  const snvD=(r.snv>0?"+":"")+r.snv;
+  const pct=(r.snv+50)/100;
+  const fams=[{id:"ACTIVER",c:C.pB,d:"Manque d'énergie",d2:"Système trop bas"},
+    {id:"ENTRETENIR",c:C.fB,d:"Équilibre",d2:"Temps disponible"},
+    {id:"RÉGULER",c:C.oB,d:"Tension modérée",d2:"Système qui monte"},
+    {id:"FREINER",c:C.rB,d:"Surcharge",d2:"Système trop haut"}];
+  const famsHtml=fams.map(f=>{
+    const ac=f.id===r.fa;
+    return`<div style="flex:1;text-align:center;background:${ac?f.c+'20':'transparent'};border:1px solid ${ac?f.c+'88':C.border};border-radius:11px;padding:9px 3px">
+      <div style="display:flex;justify-content:center;margin-bottom:6px">${svgFamilyIcon(f.id,28)}</div>
+      <div style="font-size:7px;font-weight:700;color:${f.c};margin-bottom:3px">${f.id}</div>
+      <div style="font-size:7px;color:${C.ts};line-height:1.3">${f.d}</div>
+      <div style="font-size:7px;color:${C.ts};line-height:1.3">${f.d2}</div>
+    </div>`;
+  }).join('');
+  return`
+    ${topBar("RÉSULTAT",r.cl,"go('home')")}
+    <div class="scroll" style="padding:18px 16px">
+      <div style="display:flex;justify-content:center;margin-bottom:16px">
+        <div style="position:relative;width:170px;height:170px">
+          ${svgRing(pct,r.co,170,14)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="big-num">${snvD}</div>
+            <div class="zone-label" style="color:${r.cl}">${r.zo}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px;text-align:center"><div style="font-size:14px;color:${C.tx};line-height:1.8">${r.de}</div></div>
+      <div style="background:${r.bg};border:1px solid ${r.co}55;border-radius:14px;padding:18px;margin-bottom:14px">
+        <div style="font-size:9px;color:${r.cl};letter-spacing:2px;margin-bottom:8px;font-weight:700">ORIENTATION</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:30px;font-weight:900;color:${C.tx};margin-bottom:8px">${r.fa.charAt(0)+r.fa.slice(1).toLowerCase()}</div>
+            <div style="background:${C.cardAlt};border-radius:10px;padding:10px 12px;font-size:12px;color:${C.ts};line-height:1.6">${r.co2}</div>
+          </div>
+          ${svgFamilyIcon(r.fa,56)}
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;gap:8px">${famsHtml}</div>
+      </div>
+      <button class="btn-primary" style="background:${r.co}" onclick="go('home')"><span>Retour à l'accueil</span><span>→</span></button>
+    </div>`;
+}
+
+// ─── NEUROFLEX ───
+function renderNF(){
+  const nf=getNF()||72;
+  const segs=[{r:"0–30",lb:"Faible",c:C.rB,ic:"FREINER"},{r:"31–60",lb:"Moyenne",c:C.oB,ic:"RÉGULER"},
+    {r:"61–80",lb:"Bonne",c:C.fB,ic:"ENTRETENIR"},{r:"81–100",lb:"Excellente",c:C.pB,ic:"ACTIVER"}];
+  const ai=nf<=30?0:nf<=60?1:nf<=80?2:3;
+  const segsHtml=segs.map((s,i)=>`
+    <div style="flex:1;text-align:center;background:${i===ai?s.c+'22':'transparent'};border:1px solid ${i===ai?s.c+'88':C.border};border-radius:11px;padding:10px 3px">
+      <div style="display:flex;justify-content:center;margin-bottom:6px">${svgFamilyIcon(s.ic,28)}</div>
+      <div style="font-size:8px;color:${s.c};font-weight:700;margin-bottom:2px">${s.r}</div>
+      <div style="font-size:8px;color:${i===ai?s.c:C.ts}">${s.lb}</div>
+    </div>`).join('');
+  return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('history')">←</button>
+      <div style="text-align:center">${svgMurLogo(20,C.fL)}<div style="font-size:10px;letter-spacing:2px;color:${C.fL};font-weight:700;margin-top:2px">NEUROFLEX</div></div>
+      <div style="width:28px"></div>
+    </div>
+    <div class="scroll" style="padding:22px 16px">
+      <div style="display:flex;justify-content:center;margin-bottom:16px">
+        <div style="position:relative;width:200px;height:200px">
+          ${svgRing(nf/100,segs[ai].c,200,16)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:70px;font-weight:900;color:${C.tx};line-height:1">${nf}</div>
+            <div style="font-size:14px;color:${C.ts};margin-top:3px">/100</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:16px;color:${C.tx};line-height:1.6">${segs[ai].lb} capacité<br/>d'adaptation</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:14px">${segsHtml}</div>
+        <div style="font-size:13px;color:${C.ts};text-align:center;line-height:1.7;padding:12px 0 0;border-top:1px solid ${C.border}">
+          Plus votre score est élevé,<br/>plus votre système est souple<br/>et résilient face aux défis.
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── SYNTHÈSE ───
+function renderHistory(){
+  const kis=getKis(),now=getNow(),nf=getNF();
+  let lev=null,lc=C.fB,lb=C.fBg;
+  if(now){lev=now.fa;lc=now.co;lb=now.bg;}
+  else if(kis){lev=kis.pr==="FONCEUR"?"RÉGULER":kis.pr==="POSÉ"?"ACTIVER":"ENTRETENIR";lc=kis.pr==="FONCEUR"?C.oB:kis.pr==="POSÉ"?C.pB:C.fB;lb=kis.pr==="FONCEUR"?C.oBg:kis.pr==="POSÉ"?C.pBg:C.fBg;}
+  const ld={ACTIVER:"Cherchez les exercices portant ce symbole.",ENTRETENIR:"Cherchez les exercices portant ce symbole.",RÉGULER:"Cherchez les exercices portant ce symbole.",FREINER:"Cherchez les exercices portant ce symbole."};
+
+  if(!kis&&!now)return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
+      <span style="font-size:11px;letter-spacing:2.5px;color:${C.fL};font-weight:700">SYNTHÈSE</span>
+      <div style="width:28px"></div>
+    </div>
+    <div class="scroll" style="padding:40px 16px;text-align:center;color:${C.ts}">
+      ${svgMurLogo(52,C.td)}
+      <div style="margin-top:20px;font-size:14px;line-height:1.8">Complétez au moins un test<br/>pour voir votre synthèse.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:24px">
+        <button class="btn-primary" style="background:${C.fB}" onclick="go('kis-quiz')">Commencer ki.S</button>
+        <button class="btn-primary" style="background:${C.oB}" onclick="go('now-quiz')">Commencer Ici & Maintenant</button>
+      </div>
+    </div>`;
+
+  return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('home')">←</button>
+      <span style="font-size:11px;letter-spacing:2.5px;color:${C.fL};font-weight:700">SYNTHÈSE</span>
+      <button onclick="go('hist-list')" style="background:none;border:1px solid ${C.border};border-radius:8px;padding:4px 10px;color:${C.ts};font-size:11px;cursor:pointer">Historique</button>
+    </div>
+    <div class="scroll" style="padding:12px 14px">
+      <div style="background:${kis?kis.bg:C.cardAlt};border:1px solid ${kis?kis.co+'66':C.border};border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:${C.tx}">ki.S</div>
+          ${kis?`<div style="font-size:13px;color:${C.ts};margin-top:2px">${kis.pr}</div>${kis.dom?`<div style="font-size:11px;color:${C.ts}">${kis.dom}</div>`:""}`:`<button onclick="go('kis-quiz')" style="margin-top:5px;background:${C.fB};border:none;border-radius:7px;padding:5px 12px;color:${C.tx};font-size:11px;cursor:pointer">Commencer</button>`}
+        </div>
+        ${kis?svgFigCalme(56):""}
+      </div>
+      <div style="background:${now?now.bg:C.cardAlt};border:1px solid ${now?now.co+'66':C.border};border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:${C.tx}">Ici Maintenant</div>
+          ${now?`<div style="font-size:13px;color:${now.cl};font-weight:700;margin-top:2px">${now.snv>0?"+":""}${now.snv} · ${now.zo.replace("ZONE ","Zone ")}</div><div style="font-size:13px;color:${C.tx}">${now.fa}</div>`:`<button onclick="go('now-quiz')" style="margin-top:5px;background:${C.oB};border:none;border-radius:7px;padding:5px 12px;color:${C.tx};font-size:11px;cursor:pointer">Commencer</button>`}
+        </div>
+        ${now?svgFamilyIcon(now.fa,52):""}
+      </div>
+      ${nf!==null?`
+      <div style="background:${C.cardAlt};border:1px solid ${C.border};border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;cursor:pointer" onclick="go('neuroflex')">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:${C.tx}">NeuroFlex</div>
+          <div style="font-size:22px;font-weight:900;color:${C.tx};margin-top:2px">${nf}<span style="font-size:12px;color:${C.ts};font-weight:400"> /100</span></div>
+          <div style="font-size:12px;color:${C.ts};margin-top:2px">Bonne capacité d'adaptation</div>
+        </div>
+        <div style="position:relative;width:58px;height:58px;flex-shrink:0">
+          ${svgRing(nf/100,C.fL,58,6)}
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="font-size:14px;font-weight:900;color:${C.tx}">${nf}</div>
+          </div>
+        </div>
+      </div>`:""}
+      ${lev?`
+      <div style="background:${lb};border:1px solid ${lc}55;border-radius:13px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:9px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:${C.ts};margin-bottom:4px">Aujourd'hui, votre meilleur levier est de <span style="color:${lc};font-weight:900;font-size:18px">${lev}.</span></div>
+          <div style="font-size:12px;color:${C.ts};margin-top:6px">${ld[lev]}</div>
+        </div>
+        ${svgFamilyIcon(lev,52)}
+      </div>`:""}
+    </div>`;
+}
+
+// ─── HISTORIQUE ───
+function renderHistList(){
+  const fmt=ts=>{const d=new Date(ts);return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"})+" · "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});};
+  const entries=state.history.length===0
+    ?`<div style="text-align:center;padding:48px 0;color:${C.ts}">
+        <div style="font-size:32px;margin-bottom:12px;opacity:0.3">📋</div>
+        <div style="font-size:14px;line-height:1.8">Aucune session enregistrée.</div>
+      </div>`
+    :[...state.history].reverse().map(s=>`
+      <div class="hist-entry">
+        <div style="font-size:10px;color:${C.ts};margin-bottom:8px">${fmt(s.date)}</div>
+        <div class="hist-pills">
+          ${s.kis?`<div style="background:${C.pBg};border:1px solid ${C.pB}55;border-radius:9px;padding:6px 12px">
+            <div style="font-size:9px;color:${C.pL};font-weight:700;margin-bottom:2px">KI.S</div>
+            <div style="font-size:13px;color:${C.tx};font-weight:700">${s.kis.pr}</div>
+            ${s.kis.dom?`<div style="font-size:10px;color:${C.ts}">${s.kis.dom}</div>`:""}
+          </div>`:""}
+          ${s.now?`<div style="background:${s.now.bg};border:1px solid ${s.now.co}55;border-radius:9px;padding:6px 12px">
+            <div style="font-size:9px;color:${s.now.cl};font-weight:700;margin-bottom:2px">ICI MAINTENANT</div>
+            <div style="font-size:13px;color:${C.tx};font-weight:700">${s.now.fa}</div>
+            <div style="font-size:10px;color:${C.ts}">${s.now.snv>0?"+":""}${s.now.snv} · ${s.now.zo.replace("ZONE ","Zone ")}</div>
+          </div>`:""}
+          ${s.nf!==null&&s.nf!==undefined?`<div style="background:${C.cardAlt};border:1px solid ${C.border};border-radius:9px;padding:6px 12px">
+            <div style="font-size:9px;color:${C.fL};font-weight:700;margin-bottom:2px">NEUROFLEX</div>
+            <div style="font-size:13px;color:${C.tx};font-weight:700">${s.nf}<span style="font-size:10px;color:${C.ts}">/100</span></div>
+          </div>`:""}
+        </div>
+      </div>`).join('');
+  return`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid ${C.border};flex-shrink:0">
+      <button style="background:none;border:none;color:${C.ts};font-size:20px;cursor:pointer" onclick="go('history')">←</button>
+      <span style="font-size:11px;letter-spacing:2.5px;color:${C.fL};font-weight:700">HISTORIQUE</span>
+      <button onclick="clearHistory()" style="background:none;border:1px solid ${C.border};border-radius:8px;padding:4px 10px;color:${C.ts};font-size:11px;cursor:pointer">Effacer</button>
+    </div>
+    <div class="scroll" style="padding:14px">${entries}</div>`;
+}
+
+// ─── CONSEILS ───
+const CONS={
+  ACTIVER:[{t:"Marche rapide",d:"5–10 min à bon rythme pour réveiller le corps."},{t:"Respiration activante",d:"Inspirez 4 temps, expirez 2 temps. 10 cycles."},{t:"Posture d'ouverture",d:"Épaules arrière, tête haute. Tenez 2 minutes."},{t:"Eau froide",d:"Poignets sous l'eau froide pour stimuler l'éveil nerveux."}],
+  ENTRETENIR:[{t:"Scan corporel",d:"3 minutes pour observer chaque partie du corps."},{t:"Respiration cohérente",d:"Inspirez 5, expirez 5. 5 minutes suffisent."},{t:"Ancrage au sol",d:"Pieds à plat, sentez le contact avec le sol."},{t:"Pause sensorielle",d:"5 vus, 4 touchés, 3 entendus, 2 sentis, 1 goûté."}],
+  RÉGULER:[{t:"Respiration 4-7-8",d:"Inspirez 4, retenez 7, expirez 8. Répétez 4 fois."},{t:"Décharge physique",d:"Secouez mains et bras 30 secondes."},{t:"Changement d'espace",d:"Sortez 5 min ou changez de pièce."},{t:"Écriture express",d:"3 minutes sans filtre : tout ce qui vous occupe."}],
+  FREINER:[{t:"STOP immédiat",d:"Posez tout. Rien pendant 2 minutes."},{t:"Respiration longue",d:"Expirez 2× plus long que l'inspiration. 5 min."},{t:"Grounding",d:"Pieds nus sur le sol. Concentrez-vous sur les sensations."},{t:"Obscurité & silence",d:"Éteignez les écrans. Yeux fermés. 10 min."}]
+};
+function renderConseils(){
+  const now=getNow(),f=now?now.fa:null;
+  if(!f)return`
+    ${topBar("CONSEILS",C.fL,"go('home')")}
+    <div class="scroll" style="padding:40px 16px;text-align:center;color:${C.ts}">
+      ${svgIcoEntretenir(56)}
+      <div style="margin-top:18px;font-size:14px;line-height:1.8">Complétez «Ici & Maintenant»<br/>pour voir vos conseils personnalisés.</div>
+      <button class="btn-primary" style="background:${C.oB};margin-top:24px" onclick="go('now-quiz')">Commencer →</button>
+    </div>`;
+  const items=CONS[f].map((c,i)=>`
+    <div class="card" style="display:flex;gap:13px;align-items:flex-start;margin-bottom:9px">
+      <div style="width:30px;height:30px;border-radius:50%;background:${now.co}20;border:1px solid ${now.co}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:900;color:${now.cl}">${i+1}</div>
+      <div>
+        <div style="color:${C.tx};font-weight:700;font-size:14px;margin-bottom:4px">${c.t}</div>
+        <div style="color:${C.ts};font-size:13px;line-height:1.6">${c.d}</div>
+      </div>
+    </div>`).join('');
+  return`
+    ${topBar("CONSEILS",C.fL,"go('home')")}
+    <div class="scroll" style="padding:14px">
+      <div style="display:flex;align-items:center;gap:14px;background:${now.bg};border:1px solid ${now.co}44;border-radius:13px;padding:13px;margin-bottom:14px">
+        ${svgFamilyIcon(f,44)}
+        <div>
+          <div style="font-size:9px;color:${now.cl};font-weight:700;margin-bottom:3px;letter-spacing:2px">VOTRE FAMILLE D'OUTILS</div>
+          <div style="font-size:22px;font-weight:900;color:${C.tx}">${f.charAt(0)+f.slice(1).toLowerCase()}</div>
+        </div>
+      </div>
+      ${items}
+    </div>`;
+}
+
+// ─── À PROPOS ───
+function renderAbout(){
+  const rows=[
+    {fig:svgFigPosé(44),t:"Scientifique",d:"Basée sur la plasticité du système nerveux autonome."},
+    {fig:svgFigFunam(44),t:"Personnalisée",d:"Adaptée à votre profil et votre état du moment."},
+    {fig:svgFigTension(44),t:"Évolutive",d:"Réévaluez-vous régulièrement pour affiner votre lecture."},
+    {fig:svgIcoRéguler(44),t:"Concrète",d:"Des outils pratiques pour agir au bon moment."}
+  ];
+  const rowsHtml=rows.map(r=>`
+    <div class="card" style="display:flex;gap:14px;align-items:flex-start;margin-bottom:10px">
+      <div style="flex-shrink:0">${r.fig}</div>
+      <div>
+        <div style="color:${C.tx};font-weight:700;font-size:14px;margin-bottom:4px">${r.t}</div>
+        <div style="color:${C.ts};font-size:13px;line-height:1.5">${r.d}</div>
+      </div>
+    </div>`).join('');
+  const fams=[{id:"ACTIVER",c:C.pB,d:"Manque\nd'énergie"},{id:"ENTRETENIR",c:C.fB,d:"Équilibre\ndisponible"},{id:"RÉGULER",c:C.oB,d:"Tension\nmodérée"},{id:"FREINER",c:C.rB,d:"Surcharge\nà freiner"}];
+  const famsHtml=fams.map(f=>`
+    <div style="flex:1;text-align:center;background:${C.cardAlt};border:1px solid ${C.border};border-radius:11px;padding:9px 3px">
+      <div style="display:flex;justify-content:center;margin-bottom:5px">${svgFamilyIcon(f.id,26)}</div>
+      <div style="font-size:7px;font-weight:700;color:${f.c};margin-bottom:2px">${f.id}</div>
+      ${f.d.split('\n').map(l=>`<div style="font-size:7px;color:${C.ts};line-height:1.3">${l}</div>`).join('')}
+    </div>`).join('');
+  return`
+    ${topBar("À PROPOS",C.fL,"go('home')")}
+    <div class="scroll" style="padding:22px 16px">
+      <div style="text-align:center;margin-bottom:24px">
+        ${svgMurLogo(50)}
+        <div style="font-size:9px;letter-spacing:5px;color:${C.ts};margin-top:9px">MUR</div>
+        <div style="font-size:22px;font-weight:900;color:${C.tx};margin-top:4px">Flexibilité Neuronale</div>
+      </div>
+      ${rowsHtml}
+      <div style="margin-top:10px">
+        <div style="font-size:9px;letter-spacing:2px;color:${C.ts};margin-bottom:10px;font-weight:700">4 FAMILLES D'OUTILS</div>
+        <div style="display:flex;gap:8px">${famsHtml}</div>
+      </div>
+    </div>`;
+}
+
+// ─── RENDER ───
+function render(){
+  const el=document.getElementById('screen');
+  const s=state.screen;
+  let html="";
+  if(s==="home")         html=renderHome();
+  else if(s==="kis-quiz")html=renderKiSQuiz();
+  else if(s==="kis-result")html=renderKiSResult();
+  else if(s==="now-quiz")html=renderNowQuiz();
+  else if(s==="now-result")html=renderNowResult();
+  else if(s==="neuroflex")html=renderNF();
+  else if(s==="history") html=renderHistory();
+  else if(s==="hist-list")html=renderHistList();
+  else if(s==="conseils")html=renderConseils();
+  else if(s==="about")   html=renderAbout();
+  el.innerHTML=`<div class="screen" style="display:flex;flex-direction:column;height:100%">${html}</div>`;
+  renderNav();
+}
+
+function resetAll(){
+  state.kisAns=null;state.nowAns=null;
+  state.kisStep=0;state.kisAnswers=[];state.kisSel=null;
+  state.nowStep=0;state.nowAnswers=[];state.nowSel=null;
+  persist();go('home');
+}
+function clearHistory(){state.history=[];persist();render();}
+
+// ─── INIT ───
+initFromStorage();
+render();
+</script>
+</body>
+</html>
